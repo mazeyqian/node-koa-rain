@@ -1,0 +1,65 @@
+{
+  "name": "mazey-server",
+  "version": "2.0.0",
+  "description": "Mazey's Server",
+  "main": "src/app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "ins": "npm i --registry=https://registry.npmjs.org",
+    "dev": "cross-env NODE_ENV=development pm2-dev start src/app.js",
+    "lint": "eslint ./src/* --ext 'js' --fix",
+    "restart": "cross-env NODE_ENV=production pm2 restart all --update-env",
+    "deploy": "node ./deploy.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ali-oss": "^6.10.0",
+    "axios": "^0.19.2",
+    "bluebird": "^3.7.2",
+    "child_process": "^1.0.2",
+    "crypto": "0.0.3",
+    "date-fns": "^2.16.1",
+    "koa": "^2.11.0",
+    "koa-body": "^4.2.0",
+    "koa-router": "^8.0.8",
+    "koa2-cors": "^2.0.6",
+    "lodash": "^4.17.21",
+    "mazey": "^2.1.0",
+    "md5": "^2.3.0",
+    "mysql": "^2.18.1",
+    "mysql2": "^2.1.0",
+    "node-schedule": "^2.0.0",
+    "optimist": "^0.6.1",
+    "request-promise": "^2.0.1",
+    "sequelize": "^6.3.4"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "7.6.1",
+    "@commitlint/config-conventional": "7.6.0",
+    "babel-eslint": "^10.1.0",
+    "cross-env": "^7.0.3",
+    "eslint": "5.16.0",
+    "eslint-config-standard": "12.0.0",
+    "eslint-plugin-import": "2.18.2",
+    "eslint-plugin-node": "9.2.0",
+    "eslint-plugin-promise": "4.2.1",
+    "eslint-plugin-standard": "4.0.1",
+    "husky": "2.7.0",
+    "lint-staged": "8.2.1",
+    "pm2": "^4.5.1",
+    "prettier": "1.18.2",
+    "prettier-eslint-cli": "4.7.1",
+    "scp2": "^0.5.0",
+    "ssh-exec": "^2.0.0",
+    "ssh2": "^0.4.10",
+    "webpack": "^4.44.2",
+    "webpack-cli": "^3.3.12"
+  },
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
+      "pre-commit": "lint-staged"
+    }
+  }
+}
