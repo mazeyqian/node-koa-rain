@@ -24,12 +24,13 @@ async function upload (ctx) {
       console.error(err);
     }
   }
+  console.log('file--------------------------------------', file);
   const oss_id = Number(ctx.query.oss_id) || 0;
   const tFilePath = file.path;
   // 创建可读流
   const reader = fs.createReadStream(tFilePath);
   const { name: fileName, size: fileSize, type: fileType } = file;
-  const filePath = path.join(__dirname, '../../../../asset/') + `${fileName}`;
+  const filePath = path.join(__dirname, '../../../assets/') + `${fileName}`;
   // 创建可写流
   const upStream = fs.createWriteStream(filePath);
   // 控制流文件状态

@@ -1,6 +1,6 @@
 // orm
 
-const mysqlConf = require('../secret/mysql');
+const mysqlConf = require('../secret/mysql.prd');
 const { Sequelize } = require('sequelize');
 
 const sqlIns = new Sequelize(mysqlConf.$mysql_database, mysqlConf.$mysql_username, mysqlConf.$mysql_password, {
