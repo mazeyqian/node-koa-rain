@@ -231,27 +231,27 @@ function sRobotRemindForLowSugarFruits ({ duration = '', alias = '', immediately
         {
           title: '多吃水果会发胖吗？',
           url: 'https://blog.mazey.net/2337.html?hide_sidebar=1',
-          picurl: 'https://blog.mazey.net/wp-content/uploads/2021/12/12_Low_Sugar_Fruits_You_Can_Eat_Every_Day-600x256-1.jpg',
+          picUrl: 'https://blog.mazey.net/wp-content/uploads/2021/12/12_Low_Sugar_Fruits_You_Can_Eat_Every_Day-600x256-1.jpg',
         },
         {
           title: '水果甜度与热量的关系',
           url: 'https://blog.mazey.net/2337.html?hide_sidebar=1#the-relationship-between-fruit-sweetness-and-calories',
-          picurl: 'https://blog.mazey.net/wp-content/uploads/2021/12/strawberry-300x300-1.jpg',
+          picUrl: 'https://blog.mazey.net/wp-content/uploads/2021/12/strawberry-300x300-1.jpg',
         },
         {
           title: '每天摄入 300 克水果',
           url: 'https://blog.mazey.net/2337.html?hide_sidebar=1#the-recommended-daily-intake-of-fruit-is-300-grams',
-          picurl: 'https://blog.mazey.net/wp-content/uploads/2021/12/kiwi-300x300-1.jpg',
+          picUrl: 'https://blog.mazey.net/wp-content/uploads/2021/12/kiwi-300x300-1.jpg',
         },
         {
           title: '何时吃水果最好',
           url: 'https://blog.mazey.net/2337.html?hide_sidebar=1#when-is-the-best-time-to-eat-fruit',
-          picurl: 'https://blog.mazey.net/wp-content/uploads/2021/12/apple-300x300-1.jpg',
+          picUrl: 'https://blog.mazey.net/wp-content/uploads/2021/12/apple-300x300-1.jpg',
         },
         {
           title: '果汁不能替代鲜果',
           url: 'https://blog.mazey.net/2337.html?hide_sidebar=1#fruit-juice-is-no-substitute-for-fresh-fruit',
-          picurl: 'https://blog.mazey.net/wp-content/uploads/2021/12/orange-300x300-1.jpg',
+          picUrl: 'https://blog.mazey.net/wp-content/uploads/2021/12/orange-300x300-1.jpg',
         },
       ],
     },
