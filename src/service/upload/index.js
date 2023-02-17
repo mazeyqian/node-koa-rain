@@ -8,7 +8,7 @@ const { ossPut, ossMultipartUpload } = require('./alioss');
 const { sGetUid } = require('../user');
 const { err } = require('../../entities/err');
 const { isNumber } = require('mazey');
-const { time } = require('../../utils/time');
+const { format } = require('date-fns');
 // 上传单个文件
 async function upload (ctx) {
   const file = ctx.request.files.file; // 获取上传文件
@@ -40,7 +40,7 @@ async function upload (ctx) {
     }
     fileName = rs;
   }
-  fileName = time(Date.now()) + '-' + Math.round(Math.random() * 1e9) + fileName;
+  fileName = format(Date.now(), 'yyyy-MM-dd') + '-' + Math.round(Math.random() * 1e9) + fileName;
   const filePath = path.join(__dirname, '../../assets/') + `${fileName}`;
   // 创建可写流
   const upStream = fs.createWriteStream(filePath);

@@ -1,7 +1,6 @@
 // 1.引入
 const multer = require('multer');
 const path = require('path');
-const { time } = require('../../utils/time');
 // 设置保存路径和文件名
 const storage = multer.diskStorage({
   destination: function (req, res, cb) {
@@ -20,7 +19,7 @@ const storage = multer.diskStorage({
       }
       fileName = rs;
     }
-    let fileData = time(Date.now()) + '-' + Math.round(Math.random() * 1e9) + path.extname(fileName);
+    let fileData = Date.now() + '-' + Math.round(Math.random() * 1e9) + path.extname(fileName);
     cb(null, fileName + '-' + fileData);
   },
 });
