@@ -21,7 +21,7 @@ app.use(
   koaBody({
     multipart: true,
     formidable: {
-      uploadDir: path.join(__dirname, './assets/'),
+      uploadDir: path.join(__dirname, '../../temp/'), // temp
       keepExtensions: true,
       maxFileSize: 200 * 1024 * 1024, // 设置上传文件大小最大限制，200M
     },

@@ -3,16 +3,17 @@ const fs = require('fs');
 const path = require('path');
 const { rsp, ossRsp } = require('../../entities/response');
 const { newAsset, getAsset, removeAsset } = require('../../model/asset');
-const { getOSS, mGetOSSConfs, mNewOSSConf, mNewGetOSSConfs, mAddOSSConf } = require('../../model/oss');
-const { ossPut, ossMultipartUpload } = require('./alioss');
+const { mGetOSSConfs, mNewOSSConf, mNewGetOSSConfs, mAddOSSConf } = require('../../model/oss');
+// const { ossPut, ossMultipartUpload } = require('./alioss');
 const { sGetUid } = require('../user');
 const { err } = require('../../entities/err');
 const { isNumber } = require('mazey');
 const { format } = require('date-fns');
+const mkdir = require('../../utils/mkdir');
 // 上传单个文件
 async function upload (ctx) {
   const file = ctx.request.files.file; // 获取上传文件
-  const target = ctx.query.target || 'asset/'; // 上传目录，默认 asset
+  const target = ctx.query.target || 'asset/'; // 上传目录，默认 asset 生产https://i.mazey.net/assets/aaa.jpg  生产和开发区分/web/i.mazey.net/assets/aaa.jpg
   let uid = Number(ctx.query.uid) || 0;
   // 通过指纹拿到 uid
   if (!uid) {
@@ -24,14 +25,13 @@ async function upload (ctx) {
       console.error(err);
     }
   }
-  console.log('file--------------------------------------', file);
-  const oss_id = Number(ctx.query.oss_id) || 0;
-  const tFilePath = file.path;
+  console.log('file--------------------------------------1111', file, file.fileName);
+  const tFilePath = file ? file.path : '';
   // 创建可读流
   const reader = fs.createReadStream(tFilePath);
   const { size: fileSize, type: fileType } = file;
-  let fileName = file.fileName;
-  let pattern = new RegExp("[`~!@#$^&*()=|{}':;',\\[\\].<>《》/?~!@#￥……&*()——|{}【】‘;:”“'。,、? ]");
+  let fileName = file.name || 'upload';
+  let pattern = new RegExp("[`~!@#$^&*()=|{}':;',\\[\\]<>《》/?~!@#￥……&*()——|{}【】‘;:”“'。,、? ]");
   if (pattern.test(fileName)) {
     // 有特殊字符就去掉
     let rs = '';
@@ -40,8 +40,15 @@ async function upload (ctx) {
     }
     fileName = rs;
   }
-  fileName = format(Date.now(), 'yyyy-MM-dd') + '-' + Math.round(Math.random() * 1e9) + fileName;
-  const filePath = path.join(__dirname, '../../assets/') + `${fileName}`;
+  fileName = format(Date.now(), 'yyyy-MM-dd') + '-' + Math.round(Math.random() * 1e9) + '-' + fileName;
+  console.log('fileName-------------------------------', fileName);
+  let fileUrl = '../../assets/' + file.type;
+  await mkdir.mkdirs(fileUrl, err => {
+    console.log('err', err); // 错误的话，直接打印
+  });
+  let downloadFileUrl = `../../../assets/${file.type}/`;
+  console.log('downloadFileUrl', downloadFileUrl);
+  const filePath = path.join(__dirname, downloadFileUrl) + `${fileName}`;
   // 创建可写流
   const upStream = fs.createWriteStream(filePath);
   // 控制流文件状态
@@ -49,34 +56,14 @@ async function upload (ctx) {
   const status = new Promise(resolve => {
     ok = resolve;
   }, console.error);
-  // 获取 oss 配置
-  const ossConf = await getOSS({ oss_id: oss_id });
-  const { region, access_key_id: accessKeyId, access_key_secret: accessKeySecret, bucket, cdn_domain: cdnDomain } = ossConf;
-  // 上传 oss
-  const ossUploadParams = {
-    // await ossPut({
-    region,
-    accessKeyId,
-    accessKeySecret,
-    bucket,
-    source: tFilePath, // filePath,
-    target,
-    fileName,
-  };
-  let ossResult;
-  if (fileSize < 2097152) {
-    // < 2M
-    ossResult = await ossPut(ossUploadParams);
-  } else {
-    // >= 2M
-    ossResult = await ossMultipartUpload(ossUploadParams);
-  }
+  let cdnDomain = 'https://i.mazey.net/';
+  let ossResult = '';
   // 生成入库字段
   const assetLink = `https://mazey.cn/asset/${fileName}`;
   const showLink = `${cdnDomain}${target}${fileName}`;
   // 入库
   await newAsset({
-    asset_oss_id: oss_id,
+    asset_oss_id: 0,
     asset_link: assetLink,
     asset_oss_link: ossResult,
     asset_show_link: showLink,

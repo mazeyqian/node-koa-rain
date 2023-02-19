@@ -125,6 +125,7 @@ server
   })
   // Upload
   .post('/upload', async ctx => {
+    console.log('ctx', ctx);
     ctx.body = await upload(ctx);
   })
   .get('/upload/query', async ctx => {
