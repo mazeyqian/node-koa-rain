@@ -5,13 +5,11 @@ const path = require('path'); // 导入 path 模块
 exports.mkdirs = (pathname, callback) => {
   // 需要判断是否是绝对路径（避免不必要的 bug）
   pathname = path.isAbsolute(pathname) ? pathname : path.join(__dirname, pathname);
-
   // 获取相对路径
   pathname = path.relative(__dirname, pathname);
-
   // path.sep 避免平台差异带来的 bug
   const floders = pathname.split(path.sep);
-
+  console.log('__dirname ___floders', __dirname, path.isAbsolute(pathname), pathname, floders);
   let pre = ''; // 最终用来拼合的路径
   floders.forEach(floder => {
     try {
@@ -19,16 +17,17 @@ exports.mkdirs = (pathname, callback) => {
       const _stat = fs.statSync(path.join(__dirname, pre, floder));
       const hasMkdir = _stat && _stat.isDirectory();
       if (hasMkdir) {
-        return callback; // && callback(`文件${floder}已经存在，不能重复创建，请重新创建！`)
+        callback && callback(null);
       }
     } catch (err) {
       // 抛出异常，文件不存在则创建文件
       try {
         // 避免父文件还没有创建的时候，先创建子文件所出现的意外 bug，这里选择同步创建文件
-        fs.mkdirSync(path.join(__dirname, pre, floder));
-        return callback && callback(null);
+        console.log('pre', pre, 'floder', floder);
+        fs.mkdirSync(path.join(__dirname, '../', pre, floder));
+        callback && callback(null);
       } catch (error) {
-        return callback && callback(error);
+        callback && callback(error);
       }
     }
     pre = path.join(pre, floder); // 路径拼合
