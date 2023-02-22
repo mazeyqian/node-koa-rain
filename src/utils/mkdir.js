@@ -14,7 +14,7 @@ exports.mkdirs = (pathname, callback) => {
   floders.forEach(floder => {
     try {
       // 没有异常，文件已经创建，提示用户该文件已经创建
-      const _stat = fs.statSync(path.join(__dirname, pre, floder));
+      const _stat = fs.statSync(path.join(__dirname, '../', pre, floder));
       const hasMkdir = _stat && _stat.isDirectory();
       if (hasMkdir) {
         callback && callback(null);

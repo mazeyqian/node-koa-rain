@@ -64,7 +64,7 @@ async function getAsset ({ asset_operator_id, asset_oss_id, limit }) {
   console.log('_ asset_operator_id:', asset_operator_id);
   const query = {
     where: {
-      asset_oss_id,
+      asset_oss_id: 0,
       asset_status: 1,
     },
     order: [['asset_create_time', 'DESC']],

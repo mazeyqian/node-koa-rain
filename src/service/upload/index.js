@@ -13,6 +13,10 @@ const mkdir = require('../../utils/mkdir');
 // 上传单个文件
 async function upload (ctx) {
   const file = ctx.request.files.file; // 获取上传文件
+  let fileUrl = 'assets/' + file.type;
+  mkdir.mkdirs(fileUrl, err => {
+    console.log('err', err); // 错误的话，直接打印
+  });
   const target = ctx.query.target || 'assets/'; // 上传目录，默认 asset 生产https://i.mazey.net/assets/aaa.jpg  生产和开发区分/web/i.mazey.net/assets/aaa.jpg
   let uid = Number(ctx.query.uid) || 0;
   // 通过指纹拿到 uid
@@ -25,7 +29,7 @@ async function upload (ctx) {
       console.error(err);
     }
   }
-  console.log('file--------------------------------------1111', process.env.NODE_ENV, file, file.fileName);
+  console.log('file--------------------------------------1111', file, 'fileName', file.name);
   const tFilePath = file ? file.path : '';
   // 创建可读流
   const reader = fs.createReadStream(tFilePath);
@@ -41,14 +45,11 @@ async function upload (ctx) {
     fileName = rs;
   }
   fileName = format(Date.now(), 'yyyy-MM-dd') + '-' + Math.round(Math.random() * 1e9) + '-' + fileName;
-  let fileUrl = 'assets/' + file.type;
-  let res = await mkdir.mkdirs(fileUrl, err => {
-    console.log('err', err); // 错误的话，直接打印
-  });
-  console.log('res', res);
   let downloadFileUrl = `../../assets/${file.type}/`;
+  console.log('__dirname', __dirname, 'downloadFileUrl', downloadFileUrl);
   const filePath = path.join(__dirname, downloadFileUrl) + `${fileName}`;
   // 创建可写流
+  console.log('filePath', filePath);
   const upStream = fs.createWriteStream(filePath);
   // 控制流文件状态
   let ok;
