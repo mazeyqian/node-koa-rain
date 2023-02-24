@@ -18,7 +18,7 @@ async function upload (ctx) {
     console.log('err', err); // 错误的话，直接打印如果地址跟
   });
   console.log('res----------------------------------', res);
-  const target = ctx.query.target || 'assets/'; // 上传目录，默认 asset 生产https://i.mazey.net/assets/aaa.jpg  生产和开发区分/web/i.mazey.net/assets/aaa.jpg
+  const target = ctx.query.target || 'assets'; // 上传目录，默认 asset 生产https://i.mazey.net/assets/aaa.jpg  生产和开发区分/web/i.mazey.net/assets/aaa.jpg
   let uid = Number(ctx.query.uid) || 0;
   // 通过指纹拿到 uid
   if (!uid) {
@@ -58,7 +58,7 @@ async function upload (ctx) {
   let ossResult = '';
   // 生成入库字段
   const assetLink = ''; // `https://mazey.cn/assets/${fileName}`;
-  const showLink = `${cdnDomain}${target}${fileName}`;
+  const showLink = `${cdnDomain}${target}/${fileName}`;
   // 入库
   await newAsset({
     asset_oss_id: 0,

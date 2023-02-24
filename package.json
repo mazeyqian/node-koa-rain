@@ -8,6 +8,8 @@
     "ins": "npm i --registry=https://registry.npmjs.org",
     "dev": "cross-env NODE_ENV=development pm2-dev start src/app.js",
     "lint": "eslint ./src/* --ext 'js' --fix",
+    "start": "cross-env NODE_ENV=production pm2 start src/app.js --name node-koa-rain --no-autorestart --update-env",
+    "stop": "cross-env NODE_ENV=production pm2 stop src/app.js --name node-koa-rain",
     "restart": "cross-env NODE_ENV=production pm2 restart all --update-env",
     "deploy": "node ./deploy.js"
   },
