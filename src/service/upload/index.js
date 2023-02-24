@@ -54,10 +54,10 @@ async function upload (ctx) {
   const status = new Promise(resolve => {
     ok = resolve;
   }, console.error);
-  let cdnDomain = process.env.NODE_ENV === 'development' ? '/web/i.mazey.net/' : 'https://i.mazey.net/';
+  let cdnDomain = process.env.NODE_ENV === 'development' ? 'http://localhost:8224/' : 'https://i.mazey.net/';
   let ossResult = '';
   // 生成入库字段
-  const assetLink = `https://mazey.cn/assets/${fileName}`;
+  const assetLink = ''; // `https://mazey.cn/assets/${fileName}`;
   const showLink = `${cdnDomain}${target}${fileName}`;
   // 入库
   await newAsset({

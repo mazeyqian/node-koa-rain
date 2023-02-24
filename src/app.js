@@ -15,7 +15,7 @@ const NODE_ENV = process.env.NODE_ENV; // development production
 const app = new Koa();
 const router = new Router();
 // 跨域
-app.use(cors());
+// app.use(cors());
 // 上传文件
 app.use(
   koaBody({
@@ -32,4 +32,4 @@ router.use('/server', server.routes(), server.allowedMethods());
 router.use('/t', tiny.routes(), tiny.allowedMethods());
 app.use(router.routes()).use(router.allowedMethods());
 // 监听端口
-app.listen(3000);
+app.listen(3224);
