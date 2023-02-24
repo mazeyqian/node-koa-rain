@@ -9,13 +9,12 @@ exports.mkdirs = (pathname, callback) => {
   pathname = path.relative(__dirname, pathname);
   // path.sep 避免平台差异带来的 bug
   const floders = pathname.split(path.sep);
-  console.log('__dirname ___floders', __dirname, path.isAbsolute(pathname), pathname, floders);
   let pre = ''; // 最终用来拼合的路径
   return new Promise((resolve, reject) => {
     floders.forEach(floder => {
       try {
         // 没有异常，文件已经创建，提示用户该文件已经创建
-        const _stat = fs.statSync(path.join(__dirname, '../', pre, floder));
+        const _stat = fs.statSync(path.join(__dirname, '../../../', pre, floder));
         const hasMkdir = _stat && _stat.isDirectory();
         if (hasMkdir) {
           callback && callback(pre);
@@ -24,8 +23,7 @@ exports.mkdirs = (pathname, callback) => {
         // 抛出异常，文件不存在则创建文件
         try {
           // 避免父文件还没有创建的时候，先创建子文件所出现的意外 bug，这里选择同步创建文件
-          console.log('pre', pre, 'floder', floder);
-          fs.mkdirSync(path.join(__dirname, '../', pre, floder));
+          fs.mkdirSync(path.join(__dirname, '../../../', pre, floder));
           callback && callback(pre);
         } catch (error) {
           callback && callback(error);

@@ -55,9 +55,8 @@ const MazeyUser = sqlIns.define(
 );
 
 MazeyUser.sync();
-
 // 新增用户
-async function acquireNewUser ({ user_signup_ip, user_signup_city, user_fingerprint, user_name, real_name }) {
+async function acquireNewUser ({ user_signup_ip, user_signup_city, user_fingerprint, user_name, real_name, user_password = '' }) {
   const amount = await MazeyUser.count({
     where: {
       user_fingerprint,
@@ -70,6 +69,7 @@ async function acquireNewUser ({ user_signup_ip, user_signup_city, user_fingerpr
       real_name,
       user_fingerprint,
       user_signup_city,
+      user_password,
     }).catch(console.error);
     if (ret && ret.dataValues) {
       return rsp({ data: ret.dataValues });

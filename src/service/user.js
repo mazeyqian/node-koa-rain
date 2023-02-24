@@ -90,7 +90,7 @@ async function sGetUserInfo (ctx) {
 }
 
 // 添加新用户
-async function sAddNewUser (ctx, nick_name, real_name = '') {
+async function sAddNewUser (ctx, nick_name, real_name = '', user_password = '') {
   if (!nick_name) {
     return err({ message: '缺少昵称' });
   }
@@ -104,12 +104,17 @@ async function sAddNewUser (ctx, nick_name, real_name = '') {
       location: { city },
     },
   } = GetUserInfoRes;
+  console.log('GetUserInfoRes------城市信息', GetUserInfoRes);
   // 新增用户
+  const {
+    data: { token: requestPassword },
+  } = user_password ? mGenToken({ str: user_password }) : { data: { token: '' } };
   const acquireNewUserRes = await acquireNewUser({
     user_name: nick_name,
     real_name,
     user_signup_ip: ip,
     user_fingerprint: md5(nick_name),
+    user_password: requestPassword,
     user_signup_city: city,
   });
   if (acquireNewUserRes.ret !== 0) {

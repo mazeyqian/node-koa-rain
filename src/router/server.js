@@ -3,7 +3,7 @@ const { getLatestVisitors, sAgentGet, sAgentPut, sAgentAny, sShowRequestInfo } =
 const { upload, getAssets, sGetOSSConfs, sNewOSSConf, sRemoveAsset, sNewGetOSSConfs, sAddOSSConf } = require('./../service/upload');
 const { uploadFile } = require('./../service/upload/upload');
 const { report } = require('./../model/report');
-const { sGetUserInfo, sLogin, sGenToken } = require('./../service/user');
+const { sGetUserInfo, sLogin, sGenToken, sAddNewUser } = require('./../service/user');
 const { sGenerateShortLink, queryShortLink } = require('./../service/tiny');
 const {
   sPunchCard,
@@ -40,6 +40,10 @@ server
   .post('/user/login', async ctx => {
     const { user_name, user_password } = ctx.request.body;
     ctx.body = await sLogin({ user_name, user_password });
+  })
+  .post('/user/register', async ctx => {
+    const { nick_name, real_name, user_password } = ctx.request.body;
+    ctx.body = await sAddNewUser(ctx, nick_name, real_name, user_password);
   })
   .post('/user/gen-token', async ctx => {
     const { str } = ctx.request.body;

@@ -45,13 +45,10 @@ async function upload (ctx) {
     fileName = rs;
   }
   fileName = format(Date.now(), 'yyyy-MM-dd') + '-' + Math.round(Math.random() * 1e9) + '-' + fileName;
-  let downloadFileUrl = `../../assets/${file.type}/`;
-  console.log('__dirname', __dirname, 'downloadFileUrl', downloadFileUrl);
+  let downloadFileUrl = `../../../../assets/${file.type}/`;
   const filePath = path.join(__dirname, downloadFileUrl) + `${fileName}`;
   // 创建可写流
-  console.log('filePath', filePath);
   const upStream = fs.createWriteStream(filePath);
-  console.log('upStream失败了嘛', upStream);
   // 控制流文件状态
   let ok;
   const status = new Promise(resolve => {
