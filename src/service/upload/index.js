@@ -3,16 +3,22 @@ const fs = require('fs');
 const path = require('path');
 const { rsp, ossRsp } = require('../../entities/response');
 const { newAsset, getAsset, removeAsset } = require('../../model/asset');
-const { getOSS, mGetOSSConfs, mNewOSSConf, mNewGetOSSConfs, mAddOSSConf } = require('../../model/oss');
-const { ossPut, ossMultipartUpload } = require('./alioss');
+const { mGetOSSConfs, mNewOSSConf, mNewGetOSSConfs, mAddOSSConf } = require('../../model/oss');
+// const { ossPut, ossMultipartUpload } = require('./alioss');
 const { sGetUid } = require('../user');
 const { err } = require('../../entities/err');
 const { isNumber } = require('mazey');
-
+const { format } = require('date-fns');
+const mkdir = require('../../utils/mkdir');
 // 上传单个文件
 async function upload (ctx) {
   const file = ctx.request.files.file; // 获取上传文件
-  const target = ctx.query.target || 'asset/'; // 上传目录，默认 asset
+  let fileUrl = 'assets/' + file.type;
+  let res = await mkdir.mkdirs(fileUrl, err => {
+    console.log('err', err); // 错误的话，直接打印如果地址跟
+  });
+  console.log('res----------------------------------', res);
+  const target = ctx.query.target || 'assets'; // 上传目录，默认 asset 生产https://i.mazey.net/assets/aaa.jpg  生产和开发区分/web/i.mazey.net/assets/aaa.jpg
   let uid = Number(ctx.query.uid) || 0;
   // 通过指纹拿到 uid
   if (!uid) {
@@ -24,12 +30,23 @@ async function upload (ctx) {
       console.error(err);
     }
   }
-  const oss_id = Number(ctx.query.oss_id) || 0;
-  const tFilePath = file.path;
+  const tFilePath = file ? file.path : '';
   // 创建可读流
   const reader = fs.createReadStream(tFilePath);
-  const { name: fileName, size: fileSize, type: fileType } = file;
-  const filePath = path.join(__dirname, '../../../../asset/') + `${fileName}`;
+  const { size: fileSize, type: fileType } = file;
+  let fileName = file.name || 'upload';
+  let pattern = new RegExp("[`~!@#$^&*()=|{}':;',\\[\\]<>《》/?~!@#￥……&*()——|{}【】‘;:”“'。,、? ]");
+  if (pattern.test(fileName)) {
+    // 有特殊字符就去掉
+    let rs = '';
+    for (let i = 0; i < fileName.length; i++) {
+      rs += fileName.substr(i, 1).replace(pattern, '');
+    }
+    fileName = rs;
+  }
+  fileName = format(Date.now(), 'yyyy-MM-dd') + '-' + Math.round(Math.random() * 1e9) + '-' + fileName;
+  let downloadFileUrl = `../../../../assets/${file.type}/`;
+  const filePath = path.join(__dirname, downloadFileUrl) + `${fileName}`;
   // 创建可写流
   const upStream = fs.createWriteStream(filePath);
   // 控制流文件状态
@@ -37,34 +54,14 @@ async function upload (ctx) {
   const status = new Promise(resolve => {
     ok = resolve;
   }, console.error);
-  // 获取 oss 配置
-  const ossConf = await getOSS({ oss_id: oss_id });
-  const { region, access_key_id: accessKeyId, access_key_secret: accessKeySecret, bucket, cdn_domain: cdnDomain } = ossConf;
-  // 上传 oss
-  const ossUploadParams = {
-    // await ossPut({
-    region,
-    accessKeyId,
-    accessKeySecret,
-    bucket,
-    source: tFilePath, // filePath,
-    target,
-    fileName,
-  };
-  let ossResult;
-  if (fileSize < 2097152) {
-    // < 2M
-    ossResult = await ossPut(ossUploadParams);
-  } else {
-    // >= 2M
-    ossResult = await ossMultipartUpload(ossUploadParams);
-  }
+  let cdnDomain = process.env.NODE_ENV === 'development' ? 'http://localhost:8224/' : 'https://i.mazey.net/';
+  let ossResult = '';
   // 生成入库字段
-  const assetLink = `https://mazey.cn/asset/${fileName}`;
-  const showLink = `${cdnDomain}${target}${fileName}`;
+  const assetLink = ''; // `https://mazey.cn/assets/${fileName}`;
+  const showLink = `${cdnDomain}${target}/${fileName}`;
   // 入库
   await newAsset({
-    asset_oss_id: oss_id,
+    asset_oss_id: 0,
     asset_link: assetLink,
     asset_oss_link: ossResult,
     asset_show_link: showLink,
@@ -73,6 +70,7 @@ async function upload (ctx) {
     asset_size: fileSize,
     asset_operator_id: uid,
     asset_file_name: fileName,
+    token: ctx.query.token,
   });
   ok(
     rsp({
@@ -94,10 +92,10 @@ async function upload (ctx) {
 }
 
 // 查询静态资源
-async function getAssets ({ ctx, asset_operator_id }) {
+async function getAssets ({ ctx, token, asset_operator_id }) {
   console.log('_ asset_operator_id:', asset_operator_id);
   const limit = Boolean(ctx.query.limit) && Number(ctx.query.limit);
-  const assets = await getAsset({ asset_oss_id: Number(ctx.query.oss_id), limit });
+  const assets = await getAsset({ asset_oss_id: Number(ctx.query.oss_id), token, limit });
   if (!assets) {
     return err({ message: '查询错误' });
   }

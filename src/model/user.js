@@ -55,9 +55,8 @@ const MazeyUser = sqlIns.define(
 );
 
 MazeyUser.sync();
-
 // 新增用户
-async function acquireNewUser ({ user_signup_ip, user_signup_city, user_fingerprint, user_name, real_name }) {
+async function acquireNewUser ({ user_signup_ip, user_signup_city, user_fingerprint, user_name, real_name, user_password = '' }) {
   const amount = await MazeyUser.count({
     where: {
       user_fingerprint,
@@ -70,6 +69,7 @@ async function acquireNewUser ({ user_signup_ip, user_signup_city, user_fingerpr
       real_name,
       user_fingerprint,
       user_signup_city,
+      user_password,
     }).catch(console.error);
     if (ret && ret.dataValues) {
       return rsp({ data: ret.dataValues });
@@ -125,13 +125,12 @@ async function mLogin ({ user_name, user_password }) {
 function mGenToken ({ str }) {
   return rsp({ data: { token: md5(`${str}+mazey`) } });
 }
-
-// 获取用户名（根据密码）
-async function mGetUserNameByPassword ({ user_password }) {
+// 获取用户Id（根据token密码）
+async function mGetUserIdByPassword ({ user_password }) {
   const ret = await MazeyUser.findOne({
     where: {
       user_password,
-      user_name: {
+      user_id: {
         [Op.and]: {
           [Op.ne]: '',
           [Op.not]: null,
@@ -142,8 +141,34 @@ async function mGetUserNameByPassword ({ user_password }) {
   if (!ret) {
     return err({ message: '用户不存在' });
   }
-  const { user_name: userName } = ret;
-  return rsp({ data: { userName } });
+  const { user_id: userId } = ret;
+  return rsp({ data: { userId } });
+}
+
+// 获取用户名和id（根据密码）
+async function mGetUserNameByPassword ({ user_password }) {
+  const ret = await MazeyUser.findOne({
+    where: {
+      user_password,
+      user_name: {
+        [Op.and]: {
+          [Op.ne]: '',
+          [Op.not]: null,
+        },
+      },
+      user_id: {
+        [Op.and]: {
+          [Op.ne]: '',
+          [Op.not]: null,
+        },
+      },
+    },
+  }).catch(console.error);
+  if (!ret) {
+    return err({ message: '用户不存在' });
+  }
+  const { user_name: userName, user_id: userId } = ret;
+  return rsp({ data: { userName, userId } });
 }
 
 module.exports = {
@@ -151,5 +176,6 @@ module.exports = {
   getUid,
   mLogin,
   mGenToken,
+  mGetUserIdByPassword,
   mGetUserNameByPassword,
 };

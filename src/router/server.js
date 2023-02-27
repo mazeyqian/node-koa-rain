@@ -1,8 +1,9 @@
 const { getCityInfo } = require('./../service/ip');
 const { getLatestVisitors, sAgentGet, sAgentPut, sAgentAny, sShowRequestInfo } = require('./../service/visitor');
 const { upload, getAssets, sGetOSSConfs, sNewOSSConf, sRemoveAsset, sNewGetOSSConfs, sAddOSSConf } = require('./../service/upload');
+const { uploadFile } = require('./../service/upload/upload');
 const { report } = require('./../model/report');
-const { sGetUserInfo, sLogin, sGenToken } = require('./../service/user');
+const { sGetUserInfo, sLogin, sGenToken, sAddNewUser } = require('./../service/user');
 const { sGenerateShortLink, queryShortLink } = require('./../service/tiny');
 const {
   sPunchCard,
@@ -39,6 +40,10 @@ server
   .post('/user/login', async ctx => {
     const { user_name, user_password } = ctx.request.body;
     ctx.body = await sLogin({ user_name, user_password });
+  })
+  .post('/user/register', async ctx => {
+    const { nick_name, real_name, user_password } = ctx.request.body;
+    ctx.body = await sAddNewUser(ctx, nick_name, real_name, user_password);
   })
   .post('/user/gen-token', async ctx => {
     const { str } = ctx.request.body;
@@ -127,7 +132,8 @@ server
     ctx.body = await upload(ctx);
   })
   .get('/upload/query', async ctx => {
-    ctx.body = await getAssets({ ctx, asset_operator_id: Number(ctx.query.uid) });
+    const { token } = ctx.query;
+    ctx.body = await getAssets({ ctx, token, asset_operator_id: Number(ctx.query.uid) });
   })
   .post('/upload/remove', async ctx => {
     ctx.body = await sRemoveAsset(ctx);
@@ -146,6 +152,23 @@ server
     const { ossName, region, accessKeyId, accessKeySecret, bucket, cdnDomain, userName } = ctx.request.body;
     ctx.body = await sAddOSSConf({ ossName, region, accessKeyId, accessKeySecret, bucket, cdnDomain, userName });
   })
+  // 单个文件上传
+  .post('/upload/single', uploadFile.single('file'), (req, res) => {
+    res.json({
+      code: 200,
+      msg: '上传成功!',
+      data: req.file,
+    });
+  })
+
+  // 多个文件上传
+  // .post('/upload/array', uploadFile.array('file'), (req, res) => {
+  //   res.json({
+  //     code: 200,
+  //     msg: '上传成功!',
+  //     data: req.file,
+  //   });
+  // })
   // Agent
   .get('/agent/get', async ctx => {
     ctx.body = await sAgentGet(ctx);

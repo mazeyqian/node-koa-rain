@@ -23,6 +23,7 @@ temp/
 # Local env files
 .env.local
 .env.*.local
+mysql.prd.js
 
 # Log files
 npm-debug.log*
