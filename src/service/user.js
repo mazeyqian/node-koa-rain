@@ -8,7 +8,7 @@ const weatherIns = new WeatherApi(WeatherConf.UID, WeatherConf.KEY);
 const axios = require('axios');
 const { format } = require('date-fns');
 const md5 = require('md5');
-
+const nodemailer = require('nodemailer');
 // 获取 uid
 async function sGetUid (ctx) {
   if (ctx.query.uid) return rsp({ data: { uid: Number(ctx.query.uid) } });
@@ -90,9 +90,42 @@ async function sGetUserInfo (ctx) {
 }
 
 // 添加新用户
-async function sAddNewUser (ctx, nick_name, real_name = '', user_password = '') {
+async function sendMail (sendMail) {
+  const config = {
+    service: '163',
+    auth: {
+      // 发件人邮箱账号
+      user: '18756272368@163.com', // 发件人邮箱的授权码 这里可以通过qq邮箱获取 并且不唯一
+      pass: 'NKPJLZONGEDXSYVP', // 授权码生成之后，要等一会才能使用，否则验证的时候会报错
+    },
+  };
+  const transporter = nodemailer.createTransport(config);
+  // 创建一个收件人对象
+  const mail = {
+    // 发件人 邮箱 '昵称<发件人邮箱>'
+    from: `"某某系统"<18756272368*@163.com>`,
+    // 主题
+    subject: '邮箱校验通知',
+    // 收件人 的邮箱
+    to: sendMail,
+    // 这里可以添加html标签
+    html: '',
+  };
+  transporter.sendMail(mail, function (error, info) {
+    if (error) {
+      return console.log(error);
+    }
+    transporter.close();
+    console.log('mail sent:', info.response);
+  });
+}
+async function sAddNewUser (ctx, nick_name, real_name = '', user_password = '', user_email = '') {
   if (!nick_name) {
     return err({ message: '缺少昵称' });
+  }
+  let regTest = /^[a-zA-Z\u4e00-\u9fa5][a-zA-Z0-9\u4e00-\u9fa5]*$/;
+  if (!regTest.test(nick_name)) {
+    return err({ message: '昵称不符合规范,请重新输入' });
   }
   const GetUserInfoRes = await sGetUserInfo(ctx);
   if (GetUserInfoRes.ret !== 0) {
@@ -111,6 +144,7 @@ async function sAddNewUser (ctx, nick_name, real_name = '', user_password = '') 
   } = user_password ? mGenToken({ str: user_password }) : { data: { token: '' } };
   const acquireNewUserRes = await acquireNewUser({
     user_name: nick_name,
+    user_email,
     real_name,
     user_signup_ip: ip,
     user_fingerprint: md5(nick_name),
@@ -149,6 +183,7 @@ function sGenToken ({ str }) {
 }
 
 module.exports = {
+  sendMail,
   sGetUid,
   sGetUserInfo,
   sAddNewUser,

@@ -42,8 +42,8 @@ server
     ctx.body = await sLogin({ user_name, user_password });
   })
   .post('/user/register', async ctx => {
-    const { nick_name, real_name, user_password } = ctx.request.body;
-    ctx.body = await sAddNewUser(ctx, nick_name, real_name, user_password);
+    const { nick_name, real_name, user_password, user_email } = ctx.request.body;
+    ctx.body = await sAddNewUser(ctx, nick_name, real_name, user_password, user_email);
   })
   .post('/user/gen-token', async ctx => {
     const { str } = ctx.request.body;
