@@ -33,6 +33,9 @@ const MazeyUser = sqlIns.define(
     user_email: {
       type: DataTypes.STRING(50),
     },
+    user_email_code: {
+      type: DataTypes.STRING(50),
+    },
     user_signup_ip: {
       type: DataTypes.STRING(20),
     },
@@ -56,7 +59,7 @@ const MazeyUser = sqlIns.define(
 
 MazeyUser.sync();
 // 新增用户
-async function acquireNewUser ({ user_signup_ip, user_signup_city, user_fingerprint, user_name, real_name, user_password = '' }) {
+async function acquireNewUser ({ user_signup_ip, user_signup_city, user_fingerprint, user_name, real_name, user_password = '', user_email = '', user_email_code = '' }) {
   const amount = await MazeyUser.count({
     where: {
       user_fingerprint,
@@ -67,6 +70,8 @@ async function acquireNewUser ({ user_signup_ip, user_signup_city, user_fingerpr
       user_signup_ip,
       user_name,
       real_name,
+      user_email,
+      user_email_code,
       user_fingerprint,
       user_signup_city,
       user_password,

@@ -96,27 +96,29 @@ async function sendMail (sendMail) {
     auth: {
       // 发件人邮箱账号
       user: '18756272368@163.com', // 发件人邮箱的授权码 这里可以通过qq邮箱获取 并且不唯一
-      pass: 'NKPJLZONGEDXSYVP', // 授权码生成之后，要等一会才能使用，否则验证的时候会报错
+      pass: '1', // 授权码生成之后，要等一会才能使用，否则验证的时候会报错
     },
   };
   const transporter = nodemailer.createTransport(config);
+  let code = Array.from(new Array(6), () => Math.floor(Math.random() * 9)).join(''); // 先随便生成一个6位数字
   // 创建一个收件人对象
   const mail = {
     // 发件人 邮箱 '昵称<发件人邮箱>'
-    from: `"某某系统"<18756272368*@163.com>`,
+    from: `18756272368@163.com`,
     // 主题
     subject: '邮箱校验通知',
     // 收件人 的邮箱
     to: sendMail,
     // 这里可以添加html标签
-    html: '',
+    html: code,
   };
   transporter.sendMail(mail, function (error, info) {
     if (error) {
-      return console.log(error);
+      return false;
     }
     transporter.close();
     console.log('mail sent:', info.response);
+    return code;
   });
 }
 async function sAddNewUser (ctx, nick_name, real_name = '', user_password = '', user_email = '') {
@@ -127,6 +129,12 @@ async function sAddNewUser (ctx, nick_name, real_name = '', user_password = '', 
   if (!regTest.test(nick_name)) {
     return err({ message: '昵称不符合规范,请重新输入' });
   }
+  let emailRegExp = /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
+  if (user_email && !emailRegExp.test(user_email)) {
+    return err({ message: '邮箱输入错误,请重新输入' });
+  }
+  let sendMailData = await sendMail(user_email);
+  console.log('sendMailData', sendMailData);
   const GetUserInfoRes = await sGetUserInfo(ctx);
   if (GetUserInfoRes.ret !== 0) {
     return GetUserInfoRes;
@@ -145,6 +153,7 @@ async function sAddNewUser (ctx, nick_name, real_name = '', user_password = '', 
   const acquireNewUserRes = await acquireNewUser({
     user_name: nick_name,
     user_email,
+    user_email_code: sendMailData,
     real_name,
     user_signup_ip: ip,
     user_fingerprint: md5(nick_name),
