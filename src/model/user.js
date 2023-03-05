@@ -59,7 +59,7 @@ MazeyUser.sync();
 async function acquireNewUser ({ user_signup_ip, user_signup_city, user_fingerprint, user_name, real_name, user_password = '', user_email = '' }) {
   const amount = await MazeyUser.count({
     where: {
-      user_fingerprint,
+      [Op.or]: [{ user_fingerprint: user_fingerprint }, { user_email: user_email }],
     },
   });
   if (amount === 0) {

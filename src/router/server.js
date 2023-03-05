@@ -4,6 +4,7 @@ const { upload, getAssets, sGetOSSConfs, sNewOSSConf, sRemoveAsset, sNewGetOSSCo
 const { uploadFile } = require('./../service/upload/upload');
 const { report } = require('./../model/report');
 const { sGetUserInfo, sLogin, sGenToken, sAddNewUser } = require('./../service/user');
+const { sUpdateCodeStatus } = require('./../service/code');
 const { sGenerateShortLink, queryShortLink } = require('./../service/tiny');
 const {
   sPunchCard,
@@ -51,6 +52,11 @@ server
   })
   .get('/user/info', async ctx => {
     ctx.body = await sGetUserInfo(ctx);
+  })
+  // code
+  .post('/code/check-code', async ctx => {
+    const { user_email } = ctx.request.body;
+    ctx.body = await sUpdateCodeStatus(ctx, user_email);
   })
   // Robot
   .post('/robot/feperf', async ctx => {

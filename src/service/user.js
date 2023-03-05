@@ -2,13 +2,14 @@
 const { err } = require('../entities/err');
 const { rsp } = require('../entities/response');
 const { getUid, acquireNewUser, mLogin, mGenToken } = require('../model/user');
+const { acquireNewCode } = require('../model/code');
+const { sendMail } = require('./code');
 const WeatherApi = require('./weather/weather');
 const WeatherConf = require('../secret/weather');
 const weatherIns = new WeatherApi(WeatherConf.UID, WeatherConf.KEY);
 const axios = require('axios');
 const { format } = require('date-fns');
 const md5 = require('md5');
-const nodemailer = require('nodemailer');
 // 获取 uid
 async function sGetUid (ctx) {
   if (ctx.query.uid) return rsp({ data: { uid: Number(ctx.query.uid) } });
@@ -89,40 +90,6 @@ async function sGetUserInfo (ctx) {
   return rsp({ data: { ip, location, weather } });
 }
 
-// 添加新用户
-async function sendMail (sendMail) {
-  console.log('sendMail', sendMail);
-  const config = {
-    service: '163',
-    secure: true,
-    auth: {
-      // 发件人邮箱账号
-      user: '18756272368@163.com', // 发件人邮箱的授权码 这里可以通过qq邮箱获取 并且不唯一
-      pass: '1', // 授权码生成之后，要等一会才能使用，否则验证的时候会报错
-    },
-  };
-  const transporter = nodemailer.createTransport(config);
-  let code = Array.from(new Array(6), () => Math.floor(Math.random() * 9)).join(''); // 先随便生成一个6位数字
-  // 创建一个收件人对象
-  const mail = {
-    // 发件人 邮箱 '昵称<发件人邮箱>'
-    from: `18756272368@163.com`,
-    // 主题
-    subject: '邮箱校验通知',
-    // 收件人 的邮箱
-    to: sendMail,
-    // 这里可以添加html标签
-    html: code,
-  };
-  transporter.sendMail(mail, function (error, info) {
-    if (error) {
-      return false;
-    }
-    transporter.close();
-    console.log('mail sent:', info.response);
-    return code;
-  });
-}
 async function sAddNewUser (ctx, nick_name, real_name = '', user_password = '', user_email = '') {
   if (!nick_name) {
     return err({ message: '缺少昵称' });
@@ -135,8 +102,6 @@ async function sAddNewUser (ctx, nick_name, real_name = '', user_password = '', 
   if (user_email && !emailRegExp.test(user_email)) {
     return err({ message: '邮箱输入错误,请重新输入' });
   }
-  let sendMailData = await sendMail(user_email);
-  console.log('sendMailData', sendMailData);
   const GetUserInfoRes = await sGetUserInfo(ctx);
   if (GetUserInfoRes.ret !== 0) {
     return GetUserInfoRes;
@@ -164,6 +129,18 @@ async function sAddNewUser (ctx, nick_name, real_name = '', user_password = '', 
   if (acquireNewUserRes.ret !== 0) {
     return acquireNewUserRes;
   }
+  let sendMailCode = await sendMail(user_email);
+  console.log('sendMailCode', sendMailCode);
+  let user_id = acquireNewUserRes.data.user_id;
+  acquireNewCode({
+    user_id,
+    user_name: nick_name,
+    code_type: 'email',
+    user_email,
+    verify_status: 0,
+    code: sendMailCode,
+  });
+  // 成功后把验证码和user_id存进code表
   return acquireNewUserRes;
 }
 
@@ -193,7 +170,6 @@ function sGenToken ({ str }) {
 }
 
 module.exports = {
-  sendMail,
   sGetUid,
   sGetUserInfo,
   sAddNewUser,
