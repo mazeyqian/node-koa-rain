@@ -71,16 +71,16 @@ async function acquireNewCode ({ user_id, user_name, code_type, user_email, veri
 }
 // 验证码过期生产新code数据
 async function acquireNotExpireCode ({ user_email, old_code, new_code }) {
-  const amount = await MazeyCode.count({
+  const cRes = await MazeyCode.findOne({
     where: {
-      [Op.and]: [{ user_email: user_email }, { code: old_code }, { verify_status: -1 }],
+      [Op.and]: [{ user_email: user_email }, { code: old_code }],
     },
   });
-  if (amount === 1) {
+  if (cRes.dataValues) {
     const ret = await MazeyCode.create({
-      user_id: amount.dataValues.user_id,
-      user_name: amount.dataValues.user_name,
-      code_type: amount.dataValues.code_type,
+      user_id: cRes.dataValues.user_id,
+      user_name: cRes.dataValues.user_name,
+      code_type: cRes.dataValues.code_type,
       user_email: user_email,
       verify_status: 0,
       code: new_code,
@@ -100,13 +100,18 @@ async function updateCodeStatus ({ user_email, code }) {
     },
   }).catch(console.error);
   if (!cRes) {
-    return rsp({ message: '该邮箱未进行注册,请重新注册' });
+    return rsp({ message: '该邮箱已校验完成或未进行注册' });
   }
   console.log('cRes', cRes);
   // 判断code过期没
   let creat_time = Number(new Date(cRes.dataValues.create_at));
   let now_time = Number(new Date());
   if (now_time > creat_time + 15 * 60 * 1000) {
+    const ret = await cRes
+      .update({
+        verify_status: -1,
+      })
+      .catch(console.error);
     return rsp({ message: '验证码已过期, 已重新发送验证码', data: { expire: true } });
   } else {
     const ret = await cRes
@@ -137,4 +142,5 @@ module.exports = {
   acquireNewCode,
   mIsExistContent,
   updateCodeStatus,
+  acquireNotExpireCode,
 };

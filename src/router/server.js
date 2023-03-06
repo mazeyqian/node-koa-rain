@@ -55,8 +55,8 @@ server
   })
   // code
   .post('/code/check-code', async ctx => {
-    const { user_email } = ctx.request.body;
-    ctx.body = await sUpdateCodeStatus(ctx, user_email);
+    const { user_email, code } = ctx.request.body;
+    ctx.body = await sUpdateCodeStatus(ctx, user_email, code);
   })
   // Robot
   .post('/robot/feperf', async ctx => {
