@@ -1,7 +1,7 @@
 // 短链接服务
 const md5 = require('md5');
 const { rsp } = require('../entities/response');
-const { convert26 } = require('../entities/utils');
+const { convert26 } = require('../utils/utils');
 const { queryOriLink, saveOriLink, queryTinyLink, saveTinyLink } = require('../model/tiny');
 
 // 生成短链接
