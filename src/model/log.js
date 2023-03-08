@@ -1,4 +1,4 @@
-const { sqlIns } = require('../common/orm');
+const { sqlIns } = require('../entities/orm');
 const { DataTypes } = require('sequelize');
 const { rsp } = require('../entities/response');
 const { err } = require('../entities/error');
