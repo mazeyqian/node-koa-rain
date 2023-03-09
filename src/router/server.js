@@ -93,7 +93,7 @@ server
   // Query
   .get('/query/short-link', async ctx => {
     const { tiny_key } = ctx.query;
-    ctx.body = await queryShortLink({ tiny_key });
+    ctx.body = await queryShortLink(ctx, { tiny_key });
   })
   // Weather
   .get('/weather/now', async ctx => {

@@ -10,7 +10,7 @@ const { exec } = childProcess;
 const server = require('./router/server');
 const tiny = require('./router/tiny');
 const NODE_ENV = process.env.NODE_ENV; // development production
-
+let schedule = require('node-schedule');
 // 实例
 const app = new Koa();
 const router = new Router();
@@ -28,9 +28,9 @@ app.use(
   })
 );
 app.context.linkList = [];
-setTimeout(() => {
+let j = schedule.scheduleJob('*/60 * * * *', () => {
   app.context.linkList = [];
-}, 60 * 60 * 1000);
+});
 // 装载所有路由并且分类
 router.use('/server', server.routes(), server.allowedMethods());
 router.use('/t', tiny.routes(), tiny.allowedMethods());
