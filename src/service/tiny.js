@@ -30,8 +30,23 @@ async function sGenerateShortLink ({ ori_link }) {
 }
 
 // 查询短链接
-async function queryShortLink ({ tiny_key }) {
+async function queryShortLink (ctx, { tiny_key }) {
+  console.log(ctx.linkList);
+  let { linkList } = ctx;
+  let index = linkList.findIndex(item => item.tiny_key === tiny_key);
+  if (index > -1) {
+    return rsp({
+      data: {
+        queryTinyLinkResut: linkList[index].queryTinyLinkResut,
+      },
+    });
+  }
   const queryTinyLinkResut = await queryTinyLink({ tiny_key });
+  console.log('ctx.linkList', queryTinyLinkResut);
+  ctx.linkList.push({
+    tiny_key: tiny_key,
+    queryTinyLinkResut: '11',
+  });
   return rsp({
     data: {
       queryTinyLinkResut,

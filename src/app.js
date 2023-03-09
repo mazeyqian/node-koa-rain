@@ -27,6 +27,10 @@ app.use(
     },
   })
 );
+app.context.linkList = [];
+setTimeout(() => {
+  app.context.linkList = [];
+}, 60 * 60 * 1000);
 // 装载所有路由并且分类
 router.use('/server', server.routes(), server.allowedMethods());
 router.use('/t', tiny.routes(), tiny.allowedMethods());
