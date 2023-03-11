@@ -4,6 +4,7 @@ const { rsp } = require('../entities/response');
 const { getUid, acquireNewUser, mLogin, mGenToken } = require('../model/user');
 const { acquireNewCode } = require('../model/code');
 const { sendMail } = require('./code');
+const { emailRegExp, nickRegTest } = require('../utils/utils');
 const WeatherApi = require('./weather/weather');
 const { WeatherConf } = require('../config/index');
 const weatherIns = new WeatherApi(WeatherConf.UID, WeatherConf.KEY);
@@ -94,12 +95,10 @@ async function sAddNewUser (ctx, nick_name, real_name = '', user_password = '', 
   if (!nick_name) {
     return err({ message: '缺少昵称' });
   }
-  let regTest = /^[a-zA-Z\u4e00-\u9fa5][a-zA-Z0-9\u4e00-\u9fa5]*$/;
-  if (!regTest.test(nick_name)) {
+  if (!nickRegTest(nick_name)) {
     return err({ message: '昵称不符合规范,请重新输入' });
   }
-  let emailRegExp = /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
-  if (user_email && !emailRegExp.test(user_email)) {
+  if (user_email && !emailRegExp(user_email)) {
     return err({ message: '邮箱输入错误,请重新输入' });
   }
   const GetUserInfoRes = await sGetUserInfo(ctx);

@@ -77,7 +77,7 @@ async function acquireNewUser ({ user_signup_ip, user_signup_city, user_fingerpr
     }
     return err();
   }
-  return rsp({ message: '用户已存在' });
+  return rsp({ message: '用户已存在或邮箱已注册' });
 }
 
 // 查询用户 uid

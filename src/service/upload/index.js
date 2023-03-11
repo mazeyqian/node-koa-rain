@@ -13,6 +13,13 @@ const mkdir = require('../../utils/mkdir');
 // 上传单个文件
 async function upload (ctx) {
   const file = ctx.request.files.file; // 获取上传文件
+  console.log('file', file);
+  if (!file.type) {
+    return rsp({
+      message: '请上传图片',
+      data: {},
+    });
+  }
   let fileStr = file.type.split('/');
   let typeStr = '';
   if (fileStr && fileStr.length === 2) {
