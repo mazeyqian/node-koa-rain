@@ -1,5 +1,5 @@
 const WeatherApi = require('./weather');
-const WeatherConf = require('../../secret/weather');
+const { WeatherConf } = require('../../config/index');
 const { err } = require('../../entities/error');
 const { sReportErrorInfo } = require('../log');
 const weatherIns = new WeatherApi(WeatherConf.UID, WeatherConf.KEY);

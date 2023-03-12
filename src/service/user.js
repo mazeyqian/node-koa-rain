@@ -2,13 +2,15 @@
 const { err } = require('../entities/err');
 const { rsp } = require('../entities/response');
 const { getUid, acquireNewUser, mLogin, mGenToken } = require('../model/user');
+const { acquireNewCode } = require('../model/code');
+const { sendMail } = require('./code');
+const { emailRegExp, nickRegTest } = require('../utils/utils');
 const WeatherApi = require('./weather/weather');
-const WeatherConf = require('../secret/weather');
+const { WeatherConf } = require('../config/index');
 const weatherIns = new WeatherApi(WeatherConf.UID, WeatherConf.KEY);
 const axios = require('axios');
 const { format } = require('date-fns');
 const md5 = require('md5');
-
 // 获取 uid
 async function sGetUid (ctx) {
   if (ctx.query.uid) return rsp({ data: { uid: Number(ctx.query.uid) } });
@@ -89,10 +91,15 @@ async function sGetUserInfo (ctx) {
   return rsp({ data: { ip, location, weather } });
 }
 
-// 添加新用户
-async function sAddNewUser (ctx, nick_name, real_name = '', user_password = '') {
+async function sAddNewUser (ctx, nick_name, real_name = '', user_password = '', user_email = '') {
   if (!nick_name) {
     return err({ message: '缺少昵称' });
+  }
+  if (!nickRegTest(nick_name)) {
+    return err({ message: '昵称不符合规范,请重新输入' });
+  }
+  if (user_email && !emailRegExp(user_email)) {
+    return err({ message: '邮箱输入错误,请重新输入' });
   }
   const GetUserInfoRes = await sGetUserInfo(ctx);
   if (GetUserInfoRes.ret !== 0) {
@@ -111,6 +118,7 @@ async function sAddNewUser (ctx, nick_name, real_name = '', user_password = '') 
   } = user_password ? mGenToken({ str: user_password }) : { data: { token: '' } };
   const acquireNewUserRes = await acquireNewUser({
     user_name: nick_name,
+    user_email,
     real_name,
     user_signup_ip: ip,
     user_fingerprint: md5(nick_name),
@@ -120,6 +128,18 @@ async function sAddNewUser (ctx, nick_name, real_name = '', user_password = '') 
   if (acquireNewUserRes.ret !== 0) {
     return acquireNewUserRes;
   }
+  let sendMailCode = await sendMail(user_email);
+  console.log('sendMailCode', sendMailCode);
+  let user_id = acquireNewUserRes.data.user_id;
+  acquireNewCode({
+    user_id,
+    user_name: nick_name,
+    code_type: 'email',
+    user_email,
+    verify_status: 0,
+    code: sendMailCode,
+  });
+  // 成功后把验证码和user_id存进code表
   return acquireNewUserRes;
 }
 

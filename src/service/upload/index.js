@@ -13,7 +13,21 @@ const mkdir = require('../../utils/mkdir');
 // 上传单个文件
 async function upload (ctx) {
   const file = ctx.request.files.file; // 获取上传文件
-  let fileUrl = 'assets/' + file.type;
+  console.log('file', file);
+  if (!file.type) {
+    return rsp({
+      message: '请上传图片',
+      data: {},
+    });
+  }
+  let fileStr = file.type.split('/');
+  let typeStr = '';
+  if (fileStr && fileStr.length === 2) {
+    typeStr = fileStr[1].split('.');
+    typeStr = typeStr[typeStr.length - 1];
+  }
+  let lastFileStr = fileStr[0] + '/' + typeStr;
+  let fileUrl = 'assets/' + lastFileStr;
   let res = await mkdir.mkdirs(fileUrl, err => {
     console.log('err', err); // 错误的话，直接打印如果地址跟
   });
@@ -45,7 +59,7 @@ async function upload (ctx) {
     fileName = rs;
   }
   fileName = format(Date.now(), 'yyyy-MM-dd') + '-' + Math.round(Math.random() * 1e9) + '-' + fileName;
-  let downloadFileUrl = `../../../../assets/${file.type}/`;
+  let downloadFileUrl = `../../../../assets/${lastFileStr}/`;
   const filePath = path.join(__dirname, downloadFileUrl) + `${fileName}`;
   // 创建可写流
   const upStream = fs.createWriteStream(filePath);
@@ -58,7 +72,7 @@ async function upload (ctx) {
   let ossResult = '';
   // 生成入库字段
   const assetLink = ''; // `https://mazey.cn/assets/${fileName}`;
-  const showLink = `${cdnDomain}${target}/${fileName}`;
+  const showLink = `${cdnDomain}${target}/${lastFileStr}/${fileName}`;
   // 入库
   await newAsset({
     asset_oss_id: 0,

@@ -1,4 +1,4 @@
-const { sqlIns } = require('../common/orm');
+const { sqlIns } = require('../entities/orm');
 const { DataTypes } = require('sequelize');
 
 const MazeyTiny = sqlIns.define(

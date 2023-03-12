@@ -4,6 +4,7 @@ const { upload, getAssets, sGetOSSConfs, sNewOSSConf, sRemoveAsset, sNewGetOSSCo
 const { uploadFile } = require('./../service/upload/upload');
 const { report } = require('./../model/report');
 const { sGetUserInfo, sLogin, sGenToken, sAddNewUser } = require('./../service/user');
+const { sUpdateCodeStatus } = require('./../service/code');
 const { sGenerateShortLink, queryShortLink } = require('./../service/tiny');
 const {
   sPunchCard,
@@ -25,7 +26,7 @@ const { sAddLog, sReportErrorInfo } = require('./../service/log');
 const Router = require('koa-router');
 const server = new Router();
 const WeatherApi = require('../service/weather/weather');
-const WeatherConf = require('./../secret/weather');
+const { WeatherConf } = require('./../config/index');
 const { sGetRobotKeyByAlias } = require('../service/robot');
 const { sGetWeatherDaily } = require('../service/weather');
 const { sGetToken, sGetTicket } = require('../service/weixin');
@@ -42,8 +43,8 @@ server
     ctx.body = await sLogin({ user_name, user_password });
   })
   .post('/user/register', async ctx => {
-    const { nick_name, real_name, user_password } = ctx.request.body;
-    ctx.body = await sAddNewUser(ctx, nick_name, real_name, user_password);
+    const { nick_name, real_name, user_password, user_email } = ctx.request.body;
+    ctx.body = await sAddNewUser(ctx, nick_name, real_name, user_password, user_email);
   })
   .post('/user/gen-token', async ctx => {
     const { str } = ctx.request.body;
@@ -51,6 +52,11 @@ server
   })
   .get('/user/info', async ctx => {
     ctx.body = await sGetUserInfo(ctx);
+  })
+  // code
+  .post('/code/check-code', async ctx => {
+    const { user_email, code } = ctx.request.body;
+    ctx.body = await sUpdateCodeStatus(ctx, user_email, code);
   })
   // Robot
   .post('/robot/feperf', async ctx => {
@@ -87,7 +93,7 @@ server
   // Query
   .get('/query/short-link', async ctx => {
     const { tiny_key } = ctx.query;
-    ctx.body = await queryShortLink({ tiny_key });
+    ctx.body = await queryShortLink(ctx, { tiny_key });
   })
   // Weather
   .get('/weather/now', async ctx => {

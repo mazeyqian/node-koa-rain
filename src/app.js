@@ -9,13 +9,18 @@ const { isFriday, getHours } = require('date-fns');
 const { exec } = childProcess;
 const server = require('./router/server');
 const tiny = require('./router/tiny');
+const mkdir = require('./utils/mkdir');
 const NODE_ENV = process.env.NODE_ENV; // development production
-
+let schedule = require('node-schedule');
 // 实例
 const app = new Koa();
 const router = new Router();
 // 跨域
 // app.use(cors());
+// 创建temp
+mkdir.mkdirs('temp', err => {
+  console.log('err', err); // 错误的话，直接打印如果地址跟
+});
 // 上传文件
 app.use(
   koaBody({
@@ -27,6 +32,10 @@ app.use(
     },
   })
 );
+app.context.linkList = [];
+let j = schedule.scheduleJob('*/60 * * * *', () => {
+  app.context.linkList = [];
+});
 // 装载所有路由并且分类
 router.use('/server', server.routes(), server.allowedMethods());
 router.use('/t', tiny.routes(), tiny.allowedMethods());

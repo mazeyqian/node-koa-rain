@@ -1,4 +1,4 @@
-const { sqlIns } = require('../common/orm');
+const { sqlIns } = require('../entities/orm');
 const { DataTypes, Op } = require('sequelize');
 const { err } = require('../entities/error');
 const { rsp } = require('../entities/response');
@@ -56,10 +56,10 @@ const MazeyUser = sqlIns.define(
 
 MazeyUser.sync();
 // 新增用户
-async function acquireNewUser ({ user_signup_ip, user_signup_city, user_fingerprint, user_name, real_name, user_password = '' }) {
+async function acquireNewUser ({ user_signup_ip, user_signup_city, user_fingerprint, user_name, real_name, user_password = '', user_email = '' }) {
   const amount = await MazeyUser.count({
     where: {
-      user_fingerprint,
+      [Op.or]: [{ user_fingerprint: user_fingerprint }, { user_email: user_email }],
     },
   });
   if (amount === 0) {
@@ -67,6 +67,7 @@ async function acquireNewUser ({ user_signup_ip, user_signup_city, user_fingerpr
       user_signup_ip,
       user_name,
       real_name,
+      user_email,
       user_fingerprint,
       user_signup_city,
       user_password,
@@ -76,7 +77,7 @@ async function acquireNewUser ({ user_signup_ip, user_signup_city, user_fingerpr
     }
     return err();
   }
-  return rsp({ message: '用户已存在' });
+  return rsp({ message: '用户已存在或邮箱已注册' });
 }
 
 // 查询用户 uid

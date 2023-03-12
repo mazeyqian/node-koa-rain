@@ -25,9 +25,21 @@ function isEmptyContent (content) {
   return false;
 }
 
+function emailRegExp (email) {
+  let emailRegExp = /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
+  return emailRegExp.test(email);
+}
+
+function nickRegTest (nickName) {
+  let regTest = /^[a-zA-Z\u4e00-\u9fa5][a-zA-Z0-9\u4e00-\u9fa5]*$/;
+  return regTest.test(nickName);
+}
+
 module.exports = {
   checkPhone,
   convert26,
   genBookName,
   isEmptyContent,
+  emailRegExp,
+  nickRegTest,
 };

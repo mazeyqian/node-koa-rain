@@ -2,7 +2,7 @@
 const axios = require('axios');
 const { saveIPInfo } = require('../model/visitor');
 const WeatherApi = require('./weather/weather');
-const WeatherConf = require('../secret/weather');
+const { WeatherConf } = require('../config/index');
 const weatherIns = new WeatherApi(WeatherConf.UID, WeatherConf.KEY);
 const { format } = require('date-fns');
 

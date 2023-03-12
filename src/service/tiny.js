@@ -1,7 +1,7 @@
 // 短链接服务
 const md5 = require('md5');
 const { rsp } = require('../entities/response');
-const { convert26 } = require('../entities/utils');
+const { convert26 } = require('../utils/utils');
 const { queryOriLink, saveOriLink, queryTinyLink, saveTinyLink } = require('../model/tiny');
 
 // 生成短链接
@@ -30,8 +30,25 @@ async function sGenerateShortLink ({ ori_link }) {
 }
 
 // 查询短链接
-async function queryShortLink ({ tiny_key }) {
+async function queryShortLink (ctx, { tiny_key }) {
+  let { linkList } = ctx;
+  let index = linkList.findIndex(item => item.tiny_key === tiny_key);
+  if (index > -1) {
+    return rsp({
+      data: {
+        queryTinyLinkResut: {
+          ori_link: linkList[index].queryTinyLinkResut.ori_link,
+        },
+      },
+    });
+  }
   const queryTinyLinkResut = await queryTinyLink({ tiny_key });
+  if (queryTinyLinkResut) {
+    ctx.linkList.push({
+      tiny_key: tiny_key,
+      queryTinyLinkResut: queryTinyLinkResut,
+    });
+  }
   return rsp({
     data: {
       queryTinyLinkResut,
