@@ -43,6 +43,7 @@ async function queryShortLink (ctx, { tiny_key }) {
   }
   const queryTinyLinkResut = await queryTinyLink({ tiny_key });
   if (queryTinyLinkResut) {
+    console.log('执行了嘛');
     ctx.linkMap.set(tiny_key, queryTinyLinkResut.ori_link);
   }
   return rsp({

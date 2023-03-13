@@ -48,6 +48,7 @@ async function upload (ctx) {
   // 创建可读流
   const reader = fs.createReadStream(tFilePath);
   const { size: fileSize, type: fileType } = file;
+  console.log('file文件', file);
   let fileName = file.name || 'upload';
   let pattern = new RegExp("[`~!@#$^&*()=|{}':;',\\[\\]<>《》/?~!@#￥……&*()——|{}【】‘;:”“'。,、? ]");
   if (pattern.test(fileName)) {
