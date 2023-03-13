@@ -31,23 +31,19 @@ async function sGenerateShortLink ({ ori_link }) {
 
 // 查询短链接
 async function queryShortLink (ctx, { tiny_key }) {
-  let { linkList } = ctx;
-  let index = linkList.findIndex(item => item.tiny_key === tiny_key);
-  if (index > -1) {
+  let { linkMap } = ctx;
+  if (linkMap.has(tiny_key)) {
     return rsp({
       data: {
         queryTinyLinkResut: {
-          ori_link: linkList[index].queryTinyLinkResut.ori_link,
+          ori_link: linkMap.get(tiny_key),
         },
       },
     });
   }
   const queryTinyLinkResut = await queryTinyLink({ tiny_key });
   if (queryTinyLinkResut) {
-    ctx.linkList.push({
-      tiny_key: tiny_key,
-      queryTinyLinkResut: queryTinyLinkResut,
-    });
+    ctx.linkMap.set(tiny_key, queryTinyLinkResut.ori_link);
   }
   return rsp({
     data: {
@@ -57,8 +53,9 @@ async function queryShortLink (ctx, { tiny_key }) {
 }
 
 // 长链接
-async function queryOriLinkByKey ({ tiny_key }) {
+async function queryOriLinkByKey (ctx, { tiny_key }) {
   let ori_link;
+  let { linkMap } = ctx;
   const specialLink = new Map([
     ['ca', 'https://tool.mazey.net/rabbit-read/#/home'], // 小兔读书会首页
     ['cs', 'https://tool.mazey.net/rabbit-read/?from=robot#/home'], // 小兔读书会首页（机器人导流）
@@ -69,7 +66,18 @@ async function queryOriLinkByKey ({ tiny_key }) {
   if (specialLink.has(tiny_key)) {
     ori_link = specialLink.get(tiny_key);
   } else {
-    ({ ori_link = 'https://blog.mazey.net/tiny' } = (await queryTinyLink({ tiny_key })) || {});
+    if (linkMap.has(tiny_key)) {
+      return rsp({
+        data: {
+          ori_link: linkMap.get(tiny_key),
+        },
+      });
+    } else {
+      ({ ori_link = 'https://blog.mazey.net/tiny' } = (await queryTinyLink({ tiny_key })) || {});
+      if (ori_link) {
+        ctx.linkMap.set(tiny_key, ori_link);
+      }
+    }
   }
   return rsp({
     data: {

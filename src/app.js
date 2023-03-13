@@ -32,9 +32,9 @@ app.use(
     },
   })
 );
-app.context.linkList = [];
+app.context.linkMap = new Map([]);
 let j = schedule.scheduleJob('*/60 * * * *', () => {
-  app.context.linkList = [];
+  app.context.linkMap = new Map([]);
 });
 // 装载所有路由并且分类
 router.use('/server', server.routes(), server.allowedMethods());
