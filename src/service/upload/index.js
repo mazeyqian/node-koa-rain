@@ -28,10 +28,9 @@ async function upload (ctx) {
   }
   let lastFileStr = fileStr[0] + '/' + typeStr;
   let fileUrl = 'assets/' + lastFileStr;
-  let res = await mkdir.mkdirs(fileUrl, err => {
+  await mkdir.mkdirs(fileUrl, err => {
     console.log('err', err); // 错误的话，直接打印如果地址跟
   });
-  console.log('res----------------------------------', res);
   const target = ctx.query.target || 'assets'; // 上传目录，默认 asset 生产https://i.mazey.net/assets/aaa.jpg  生产和开发区分/web/i.mazey.net/assets/aaa.jpg
   let uid = Number(ctx.query.uid) || 0;
   // 通过指纹拿到 uid
@@ -48,18 +47,20 @@ async function upload (ctx) {
   // 创建可读流
   const reader = fs.createReadStream(tFilePath);
   const { size: fileSize, type: fileType } = file;
-  console.log('file文件', file);
   let fileName = file.name || 'upload';
   let pattern = new RegExp("[`~!@#$^&*()=|{}':;',\\[\\]<>《》/?~!@#￥……&*()——|{}【】‘;:”“'。,、? ]");
   if (pattern.test(fileName)) {
-    // 有特殊字符就去掉
+    // 有特殊字符或者汉字就去掉
     let rs = '';
     for (let i = 0; i < fileName.length; i++) {
       rs += fileName.substr(i, 1).replace(pattern, '');
     }
+    // fileName = rs.replace(/[\u4e00-\u9fa5]/g, ''); // 直接去掉汉字不行
     fileName = rs;
   }
-  fileName = format(Date.now(), 'yyyy-MM-dd') + '-' + Math.round(Math.random() * 1e9) + '-' + fileName;
+  console.log('fileName', fileName.split('.'));
+  let fileArray = fileName.split('.');
+  fileName = fileArray[0] + ' ' + format(Date.now(), 'yyyy-MM-dd') + ' ' + Math.round(Math.random() * 1e9) + '.' + fileArray[fileArray.length - 1];
   let downloadFileUrl = `../../../../assets/${lastFileStr}/`;
   const filePath = path.join(__dirname, downloadFileUrl) + `${fileName}`;
   // 创建可写流
