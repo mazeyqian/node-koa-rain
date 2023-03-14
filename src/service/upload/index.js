@@ -55,12 +55,15 @@ async function upload (ctx) {
     for (let i = 0; i < fileName.length; i++) {
       rs += fileName.substr(i, 1).replace(pattern, '');
     }
-    // fileName = rs.replace(/[\u4e00-\u9fa5]/g, ''); // 直接去掉汉字不行
     fileName = rs;
   }
+  fileName = fileName.replace(/[\u4e00-\u9fa5]/g, a => {
+    console.log('a', a);
+    return 'i';
+  }); // 判断有汉字就进行unique
   console.log('fileName', fileName.split('.'));
   let fileArray = fileName.split('.');
-  fileName = fileArray[0] + ' ' + format(Date.now(), 'yyyy-MM-dd') + ' ' + Math.round(Math.random() * 1e9) + '.' + fileArray[fileArray.length - 1];
+  fileName = fileArray[0] + '-' + format(Date.now(), 'yyyyMMdd') + '-' + Math.round(Math.random() * 1e9) + '.' + fileArray[fileArray.length - 1];
   let downloadFileUrl = `../../../../assets/${lastFileStr}/`;
   const filePath = path.join(__dirname, downloadFileUrl) + `${fileName}`;
   // 创建可写流
