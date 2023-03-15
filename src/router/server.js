@@ -1,7 +1,6 @@
 const { getCityInfo } = require('./../service/ip');
 const { getLatestVisitors, sAgentGet, sAgentPut, sAgentAny, sShowRequestInfo } = require('./../service/visitor');
 const { upload, getAssets, sGetOSSConfs, sNewOSSConf, sRemoveAsset, sNewGetOSSConfs, sAddOSSConf } = require('./../service/upload');
-const { uploadFile } = require('./../service/upload/upload');
 const { report } = require('./../model/report');
 const { sGetUserInfo, sLogin, sGenToken, sAddNewUser } = require('./../service/user');
 const { sUpdateCodeStatus } = require('./../service/code');
@@ -158,23 +157,6 @@ server
     const { ossName, region, accessKeyId, accessKeySecret, bucket, cdnDomain, userName } = ctx.request.body;
     ctx.body = await sAddOSSConf({ ossName, region, accessKeyId, accessKeySecret, bucket, cdnDomain, userName });
   })
-  // 单个文件上传
-  .post('/upload/single', uploadFile.single('file'), (req, res) => {
-    res.json({
-      code: 200,
-      msg: '上传成功!',
-      data: req.file,
-    });
-  })
-
-  // 多个文件上传
-  // .post('/upload/array', uploadFile.array('file'), (req, res) => {
-  //   res.json({
-  //     code: 200,
-  //     msg: '上传成功!',
-  //     data: req.file,
-  //   });
-  // })
   // Agent
   .get('/agent/get', async ctx => {
     ctx.body = await sAgentGet(ctx);
