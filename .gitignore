@@ -24,6 +24,7 @@ temp/
 .env.local
 .env.*.local
 mysql.prd.js
+email.js
 env.production.js
 
 # Log files
