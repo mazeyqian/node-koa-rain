@@ -10,6 +10,8 @@ const { err } = require('../../entities/err');
 const { isNumber } = require('mazey');
 const { format } = require('date-fns');
 const mkdir = require('../../utils/mkdir');
+const { assetsBaseUrl } = require('../../config/index');
+
 // 上传单个文件
 async function upload (ctx) {
   const file = ctx.request.files.file; // 获取上传文件
@@ -73,7 +75,7 @@ async function upload (ctx) {
   const status = new Promise(resolve => {
     ok = resolve;
   }, console.error);
-  let cdnDomain = process.env.NODE_ENV === 'development' ? 'http://localhost:8224/' : 'https://i.mazey.net/';
+  let cdnDomain = process.env.NODE_ENV === 'development' ? 'http://localhost:8224/' : assetsBaseUrl;
   let ossResult = '';
   // 生成入库字段
   const assetLink = ''; // `https://mazey.cn/assets/${fileName}`;

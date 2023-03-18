@@ -3,13 +3,14 @@ const md5 = require('md5');
 const { rsp } = require('../entities/response');
 const { convert26 } = require('../utils/utils');
 const { queryOriLink, saveOriLink, queryTinyLink, saveTinyLink } = require('../model/tiny');
+const { tinyBaseUrl } = require('../config/index');
 
 // 生成短链接
 async function sGenerateShortLink ({ ori_link }) {
   // 是否已存在
   const ori_md5 = md5(ori_link);
   const queryOriLinkResult = await queryOriLink({ ori_md5 });
-  const domain = 'https://mazey.cn';
+  const domain = tinyBaseUrl; // 'https://mazey.cn';
   let tiny_link = '';
   if (!queryOriLinkResult) {
     // 新增长链接
