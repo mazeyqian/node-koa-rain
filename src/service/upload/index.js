@@ -7,6 +7,7 @@ const { mGetOSSConfs, mNewOSSConf, mNewGetOSSConfs, mAddOSSConf } = require('../
 // const { ossPut, ossMultipartUpload } = require('./alioss');
 const { sGetUid } = require('../user');
 const { err } = require('../../entities/err');
+const { jwtVerify } = require('../../entities/jwt');
 const { isNumber } = require('mazey');
 const { format } = require('date-fns');
 const mkdir = require('../../utils/mkdir');
@@ -14,6 +15,16 @@ const { assetsBaseUrl } = require('../../config/index');
 
 // 上传单个文件
 async function upload (ctx) {
+  // 对token进行解码
+  let userToken = ctx.request.header.usertoken;
+  let jwtToken = jwtVerify(userToken);
+  console.log('userToken', userToken, jwtToken);
+  if (jwtToken.code !== 2) {
+    return rsp({
+      message: '用户登陆过期,请重新登陆',
+      data: {},
+    });
+  }
   const file = ctx.request.files.file; // 获取上传文件
   console.log('file', file);
   if (!file.type) {
@@ -63,7 +74,6 @@ async function upload (ctx) {
     console.log('a', a);
     return 'i';
   }); // 判断有汉字就进行unique
-  console.log('fileName', fileName.split('.'));
   let fileArray = fileName.split('.');
   fileName = fileArray[0] + '-' + format(Date.now(), 'yyyyMMdd') + '-' + Math.round(Math.random() * 1e9) + '.' + fileArray[fileArray.length - 1];
   let downloadFileUrl = `../../../../assets/${lastFileStr}/`;
@@ -91,7 +101,7 @@ async function upload (ctx) {
     asset_size: fileSize,
     asset_operator_id: uid,
     asset_file_name: fileName,
-    token: ctx.query.token,
+    user_id: jwtToken.data.user_id,
   });
   ok(
     rsp({

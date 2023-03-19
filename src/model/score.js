@@ -18,21 +18,21 @@ const MazeyScore = sqlIns.define(
       type: DataTypes.INTEGER,
     },
     user_name: {
-      // 姓名
       type: DataTypes.STRING(20),
     },
-    game_type: {
-      // 游戏类型，应该有个字典
-      type: DataTypes.STRING(20),
+    game_id: {
+      // 游戏id
+      type: DataTypes.INTEGER,
     },
     game_name: {
-      type: DataTypes.STRING(20),
+      type: DataTypes.STRING(50),
     },
     score: {
       // 评分1-10分
       type: DataTypes.INTEGER,
     },
     remark: {
+      // 备注
       type: DataTypes.STRING(300),
     },
   },
