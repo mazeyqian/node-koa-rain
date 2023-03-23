@@ -1,8 +1,7 @@
 const { sqlIns } = require('../entities/orm');
-const { DataTypes, Op } = require('sequelize');
+const { DataTypes } = require('sequelize');
 const { rsp } = require('../entities/response');
 const { err } = require('../entities/error');
-const { isNumber } = require('mazey');
 
 const MazeyGame = sqlIns.define(
   'MazeyGame',
@@ -39,11 +38,20 @@ const MazeyGame = sqlIns.define(
     game_score_personnel: {
       type: DataTypes.INTEGER,
     },
+    // 发行商
     game_publisher: {
       type: DataTypes.STRING(50),
     },
+    // 发版时间
     game_release_time: {
       type: DataTypes.STRING(50),
+    },
+    // 操作人
+    user_id: {
+      type: DataTypes.INTEGER,
+    },
+    user_name: {
+      type: DataTypes.STRING(20),
     },
   },
   {
@@ -52,7 +60,24 @@ const MazeyGame = sqlIns.define(
     updatedAt: 'update_at',
   }
 );
-
+// 增加一个游戏
+async function addNewGame ({ game_picture, game_type, game_name, game_english_name, game_content, game_publisher = '', game_release_time = '' }) {
+  const ret = await MazeyGame.create({
+    game_picture,
+    game_type,
+    game_name,
+    game_english_name,
+    game_content,
+    game_publisher,
+    game_release_time,
+  }).catch(console.error);
+  if (ret && ret.dataValues) {
+    return rsp({ data: ret.dataValues });
+  }
+  return err();
+}
 MazeyGame.sync();
 
-module.exports = {};
+module.exports = {
+  addNewGame,
+};
