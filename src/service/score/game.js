@@ -4,7 +4,7 @@ const { addNewGame } = require('../model/game');
 const axios = require('axios');
 const { jwtVerify } = require('../../entities/jwt');
 // 增加游戏
-async function sAddNewGame (ctx, game_picture, game_type, game_name, game_english_name, game_content, game_publisher = '', game_release_time = '') {
+async function sAddNewGame (ctx, { game_picture, game_type, game_name, game_english_name, game_content, game_publisher = '', game_release_time = '' }) {
   if (!game_name) {
     return err({ message: '缺少游戏名称' });
   }

@@ -29,6 +29,7 @@ const { WeatherConf } = require('./../config/index');
 const { sGetRobotKeyByAlias } = require('../service/robot');
 const { sGetWeatherDaily } = require('../service/weather');
 const { sGetToken, sGetTicket } = require('../service/weixin');
+const { sAddNewGame } = require('../service/score/game');
 const weatherIns = new WeatherApi(WeatherConf.UID, WeatherConf.KEY);
 
 server
@@ -216,6 +217,11 @@ server
   })
   .get('/weixin/get-ticket', async ctx => {
     ctx.body = await sGetTicket();
+  })
+  // score
+  .post('/game/add', async ctx => {
+    const obj = ctx.request.body;
+    ctx.body = await sAddNewGame(ctx, { ...obj });
   });
 
 module.exports = server;
