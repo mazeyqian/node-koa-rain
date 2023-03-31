@@ -19,7 +19,7 @@ const {
   sGetRecentAchievement,
 } = require('./../service/nut/read');
 const { sRobotRemindFeperf, sRobotSendText, sRobotRemindForCommonTag } = require('./../service/robot/robot');
-const { rabbitKey } = require('./../service/robot/robotsConf');
+const { rabbitKey } = require('./../config/env.development');
 const { rsp } = require('./../entities/response');
 const { sAddLog, sReportErrorInfo } = require('./../service/log');
 const Router = require('koa-router');

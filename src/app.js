@@ -3,7 +3,6 @@ const cors = require('koa2-cors');
 const Router = require('koa-router');
 const koaBody = require('koa-body');
 const path = require('path');
-const { rabbitKey } = require('./service/robot/robotsConf');
 const childProcess = require('child_process');
 const { isFriday, getHours } = require('date-fns');
 const { exec } = childProcess;

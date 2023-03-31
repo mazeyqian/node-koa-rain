@@ -1,6 +1,6 @@
-const { err } = require('../entities/err');
-const { rsp } = require('../entities/response');
-const { addNewGame } = require('../model/game');
+const { err } = require('../../entities/err');
+const { rsp } = require('../../entities/response');
+const { addNewGame } = require('../../model/game');
 const axios = require('axios');
 const { jwtVerify } = require('../../entities/jwt');
 // 增加游戏
