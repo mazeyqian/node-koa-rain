@@ -4,7 +4,7 @@
 // const $mysql_database = 'mazey'; // Name
 const $mysql_server_name = 'localhost'; // Server
 const $mysql_username = 'root'; // User
-const $mysql_password = '123456'; // Password
+const $mysql_password = 'wxt123'; // Password
 const $mysql_database = 'mazey'; // Name
 const mysqlConf = {
   $mysql_server_name,
@@ -19,24 +19,16 @@ const WeatherConf = {
   UID,
   KEY,
 };
-// Robot Keys
-const rabbitKey = '#rabbit';
-// 小橘子 错误监控
-const orangeKey = '#rabbit';
-const testCarKey = '#rabbit';
-const strongerKey = '#rabbit';
-const readKey = rabbitKey;
-const forumFEHelperKey = '#rabbit';
-const TestUrl = '#rabbit';
-// Alias
+// Alias key集合
 const alias2Key = new Map([
   // 小兔子 Rabbit Daily
-  ['rabbitKey', rabbitKey],
-  // 小橘子 Orange Error
-  ['orangeKey', orangeKey],
-  ['testCarKey', testCarKey],
-  ['strongerKey', strongerKey],
-  ['forumFEHelperKey', forumFEHelperKey],
+  ['rabbitKey', '#rabbit'],
+  // 小橘子 Orange Error 错误监控
+  ['orangeKey', '#rabbit'],
+  ['pigKey', '#rabbit'],
+  ['testCarKey', '#rabbit'],
+  ['strongerKey', '#rabbit'],
+  ['forumFEHelperKey', '#rabbit'],
   ['getOffKey', '#rabbit'],
   ['touchFish01Key', '#rabbit'],
   ['touchFish02Key', '#rabbit'],
@@ -47,18 +39,11 @@ const alias2Key = new Map([
   ['forHeart', '#rabbit'],
   ['strongerGroup', '#rabbit'],
   ['stronger001', '#rabbit'],
-  ['TestUrl', TestUrl],
+  ['TestUrl', '#rabbit'],
 ]);
 
 module.exports = {
   mysqlConf,
   WeatherConf,
-  testCarKey,
-  strongerKey,
-  readKey,
-  rabbitKey,
-  forumFEHelperKey,
-  orangeKey,
   alias2Key,
-  TestUrl,
 };

@@ -61,7 +61,7 @@ const MazeyGame = sqlIns.define(
   }
 );
 // 增加一个游戏
-async function addNewGame ({ game_picture, game_type, game_name, game_english_name, game_content, game_publisher = '', game_release_time = '' }) {
+async function addNewGame ({ game_picture, game_type, game_name, game_english_name, game_content, game_publisher = '', game_release_time = '', user_id, user_name }) {
   const ret = await MazeyGame.create({
     game_picture,
     game_type,
@@ -70,6 +70,8 @@ async function addNewGame ({ game_picture, game_type, game_name, game_english_na
     game_content,
     game_publisher,
     game_release_time,
+    user_id,
+    user_name,
   }).catch(console.error);
   if (ret && ret.dataValues) {
     return rsp({ data: ret.dataValues });

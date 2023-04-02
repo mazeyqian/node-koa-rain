@@ -19,7 +19,7 @@ const {
   sGetRecentAchievement,
 } = require('./../service/nut/read');
 const { sRobotRemindFeperf, sRobotSendText, sRobotRemindForCommonTag } = require('./../service/robot/robot');
-const { rabbitKey } = require('./../config/env.development');
+const { alias2Key } = require('./../config/env.development');
 const { rsp } = require('./../entities/response');
 const { sAddLog, sReportErrorInfo } = require('./../service/log');
 const Router = require('koa-router');
@@ -64,7 +64,7 @@ server
   })
   .post('/robot/send-text', async ctx => {
     const { message } = ctx.request.body;
-    await sRobotSendText({ message, key: rabbitKey, immediately: true });
+    await sRobotSendText({ message, key: alias2Key.get('rabbitKey'), immediately: true });
     ctx.body = rsp();
   })
   .post('/robot/tags', async ctx => {

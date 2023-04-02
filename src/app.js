@@ -11,6 +11,7 @@ const tiny = require('./router/tiny');
 const mkdir = require('./utils/mkdir');
 const NODE_ENV = process.env.NODE_ENV; // development production
 let schedule = require('node-schedule');
+const { sReportErrorInfo } = require('./service/log');
 // 实例
 const app = new Koa();
 const router = new Router();
@@ -39,5 +40,10 @@ let j = schedule.scheduleJob('*/60 * * * *', () => {
 router.use('/server', server.routes(), server.allowedMethods());
 router.use('/t', tiny.routes(), tiny.allowedMethods());
 app.use(router.routes()).use(router.allowedMethods());
+// 错误监控
+app.on('error', async (err, ctx) => {
+  console.error('Server Error------------------: ', err);
+  sReportErrorInfo({ ctx, logType: 'server_error', err, url: '', alias: 'pigKey' });
+});
 // 监听端口
 app.listen(3224);

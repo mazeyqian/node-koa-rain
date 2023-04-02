@@ -12,7 +12,6 @@ const { isNumber } = require('mazey');
 const { format } = require('date-fns');
 const mkdir = require('../../utils/mkdir');
 const { assetsBaseUrl } = require('../../config/index');
-
 // 上传单个文件
 async function upload (ctx) {
   // 对token进行解码
@@ -26,7 +25,6 @@ async function upload (ctx) {
     });
   }
   const file = ctx.request.files.file; // 获取上传文件
-  console.log('file', file);
   if (!file.type) {
     return rsp({
       message: '请上传图片',
