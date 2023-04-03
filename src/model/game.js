@@ -16,7 +16,7 @@ const MazeyGame = sqlIns.define(
       type: DataTypes.STRING(50),
     },
     game_star: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.FLOAT,
     },
     game_type: {
       // 游戏的类型
@@ -33,7 +33,7 @@ const MazeyGame = sqlIns.define(
       type: DataTypes.STRING(500),
     },
     game_score: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.FLOAT,
     },
     game_score_personnel: {
       type: DataTypes.INTEGER,

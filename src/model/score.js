@@ -27,9 +27,13 @@ const MazeyScore = sqlIns.define(
     game_name: {
       type: DataTypes.STRING(50),
     },
+    start: {
+      // 1-5星支持小数
+      type: DataTypes.FLOAT,
+    },
     score: {
-      // 评分1-10分
-      type: DataTypes.INTEGER,
+      // 评分1-10分保留一位小数
+      type: DataTypes.FLOAT,
     },
     remark: {
       // 备注
@@ -44,5 +48,21 @@ const MazeyScore = sqlIns.define(
 );
 
 MazeyScore.sync();
-
-module.exports = {};
+async function addNewScore ({ game_id, game_name, score, start, remark, user_id, user_name }) {
+  const ret = await MazeyScore.create({
+    game_id,
+    game_name,
+    score,
+    start,
+    remark,
+    user_id,
+    user_name,
+  }).catch(console.error);
+  if (ret && ret.dataValues) {
+    return rsp({ data: ret.dataValues });
+  }
+  return err();
+}
+module.exports = {
+  addNewScore,
+};
