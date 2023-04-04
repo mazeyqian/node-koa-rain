@@ -2,8 +2,6 @@ const { sqlIns } = require('../entities/orm');
 const { DataTypes, Op } = require('sequelize');
 const { rsp } = require('../entities/response');
 const { err } = require('../entities/error');
-const { isNumber } = require('mazey');
-
 const MazeyScore = sqlIns.define(
   'MazeyScore',
   {
@@ -38,6 +36,9 @@ const MazeyScore = sqlIns.define(
     remark: {
       // 备注
       type: DataTypes.STRING(300),
+    },
+    content: {
+      type: DataTypes.STRING(50),
     },
   },
   {

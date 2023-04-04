@@ -10,7 +10,6 @@ async function sAddNewGame (ctx, { game_name, game_english_name, game_type, game
   }
   let userToken = ctx.request.header.usertoken;
   let jwtToken = jwtVerify(userToken);
-  console.log('userToken', userToken, jwtToken);
   if (jwtToken.code !== 2) {
     return rsp({
       message: '用户登陆过期,请重新登陆',

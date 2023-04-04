@@ -78,8 +78,21 @@ async function addNewGame ({ game_picture, game_type, game_name, game_english_na
   }
   return err();
 }
+// 获取游戏信息并且更新
+async function queryGame ({ game_id }) {
+  const ret = await MazeyGame.findOne({
+    where: {
+      game_id,
+    },
+  }).catch(console.error);
+  if (!ret) {
+    return err({ message: '该游戏不存在' });
+  }
+  return ret;
+}
 MazeyGame.sync();
 
 module.exports = {
   addNewGame,
+  queryGame,
 };
