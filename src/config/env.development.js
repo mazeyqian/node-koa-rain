@@ -19,31 +19,8 @@ const WeatherConf = {
   UID,
   KEY,
 };
-// Alias key集合
-const alias2Key = new Map([
-  // 小兔子 Rabbit Daily
-  ['rabbitKey', '#rabbit'],
-  // 小橘子 Orange Error 错误监控
-  ['orangeKey', '#rabbit'],
-  ['pigKey', '#rabbit'],
-  ['testCarKey', '#rabbit'],
-  ['strongerKey', '#rabbit'],
-  ['forumFEHelperKey', '#rabbit'],
-  ['getOffKey', '#rabbit'],
-  ['touchFish01Key', '#rabbit'],
-  ['touchFish02Key', '#rabbit'],
-  ['communityFEServerErrorUrl', '#rabbit'],
-  ['communityFEServerTestUrl', '#rabbit'],
-  ['feishuTest', '#rabbit'],
-  ['feishuStronger', '#rabbit'],
-  ['forHeart', '#rabbit'],
-  ['strongerGroup', '#rabbit'],
-  ['stronger001', '#rabbit'],
-  ['TestUrl', '#rabbit'],
-]);
 
 module.exports = {
   mysqlConf,
   WeatherConf,
-  alias2Key,
 };

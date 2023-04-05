@@ -4,7 +4,7 @@ const schedule = require('node-schedule');
 const axios = require('axios');
 const { format, subDays, lastDayOfMonth, isWeekend, isSameDay, getDay, isSaturday, isTuesday, isWednesday, isThursday, isFriday, isMonday } = require('date-fns');
 const { robotImages } = require('./imagesConf');
-const { alias2Key } = require('./../../config/env.development');
+const { strongerKey, rabbitKey, forumFEHelperKey, TestUrl } = require('./robotsConf');
 const { err } = require('../../entities/error');
 const { rsp } = require('../../entities/response');
 const { floatToPercent } = require('mazey');
@@ -115,7 +115,7 @@ function sRobotRemindLastWorkingDay ({
   url = 'https://blog.mazey.net/happy-birthday-to-you?hide_sidebar=1',
   picurl = 'https://rabbit-cn-cdn.rabbitgames.com/asset/forum/com-last-working-day.jpg',
   duration = '',
-  key = alias2Key.get('rabbitKey'),
+  key = rabbitKey,
   immediately = false,
   isSkipDayOffDates = false,
 } = {}) {
@@ -168,7 +168,7 @@ function sRobotRemindForDrinkWater ({
   title = '下午好',
   picurl = 'https://i.mazey.net/asset/robot/STRDrinkWaterBanner-1000x426.jpg',
   duration = '',
-  key = alias2Key.get('rabbitKey'),
+  key = rabbitKey,
   immediately = false,
   isSkipDayOffDates = false,
 } = {}) {
@@ -386,7 +386,7 @@ async function sRobotRemindForCommonTag ({ ctx, tags = [], contents = [], extra 
       ret += `\nlink：[🔗链接](${link})<font color="comment">*（企业微信浏览器打开后，需要再次点击右上角↗系统默认浏览器）*</font>`;
     }
     const res = await axios
-      .post(`${weComRobotUrl}?key=${realKey || alias2Key.get('rabbitKey')}`, {
+      .post(`${weComRobotUrl}?key=${realKey || rabbitKey}`, {
         msgtype: 'markdown',
         markdown: {
           content: ret,
@@ -410,11 +410,11 @@ function sRobotRemindForCommunity (repeatKey = '', repeat = true) {
   // Repeat - begin
   if (repeat) {
     repeatSend(() => {
-      sRobotRemindForCommunity(alias2Key.get('TestUrl'), false);
+      sRobotRemindForCommunity(TestUrl, false);
     });
   }
   // Repeat - end
-  const key = repeatKey || alias2Key.get('forumFEHelperKey');
+  const key = repeatKey || forumFEHelperKey;
   return [
     // 每月生日
     sRobotRemindLastWorkingDay({
@@ -520,11 +520,11 @@ function sRobotRemindForStronger (repeatKey = '', repeat = true) {
   // Repeat - begin
   if (repeat) {
     repeatSend(() => {
-      sRobotRemindForStronger(alias2Key.get('TestUrl'), false);
+      sRobotRemindForStronger(TestUrl, false);
     });
   }
   // Repeat - end
-  const key = repeatKey || alias2Key.get('strongerKey');
+  const key = repeatKey || strongerKey;
   return [
     // 天气预报
     sRobotSendColorText({
