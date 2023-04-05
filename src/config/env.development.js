@@ -25,7 +25,7 @@ const alias2Key = new Map([
   ['rabbitKey', '#rabbit'],
   // 小橘子 Orange Error 错误监控
   ['orangeKey', '#rabbit'],
-  ['pigKey', '4e247f84-2d1e-4480-8bb5-915642d90cf0'],
+  ['pigKey', '#rabbit'],
   ['testCarKey', '#rabbit'],
   ['strongerKey', '#rabbit'],
   ['forumFEHelperKey', '#rabbit'],
