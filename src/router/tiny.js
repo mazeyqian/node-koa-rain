@@ -7,7 +7,7 @@ tiny.get('/:key', async ctx => {
   const { key: tiny_key } = ctx.params;
   const {
     data: { ori_link },
-  } = await queryOriLinkByKey({ tiny_key });
+  } = await queryOriLinkByKey(ctx, { tiny_key });
   ctx.status = 301;
   ctx.redirect(ori_link);
 });

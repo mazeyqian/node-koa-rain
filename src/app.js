@@ -3,7 +3,6 @@ const cors = require('koa2-cors');
 const Router = require('koa-router');
 const koaBody = require('koa-body');
 const path = require('path');
-const { rabbitKey } = require('./service/robot/robotsConf');
 const childProcess = require('child_process');
 const { isFriday, getHours } = require('date-fns');
 const { exec } = childProcess;
@@ -12,6 +11,7 @@ const tiny = require('./router/tiny');
 const mkdir = require('./utils/mkdir');
 const NODE_ENV = process.env.NODE_ENV; // development production
 let schedule = require('node-schedule');
+const { sReportErrorInfo } = require('./service/log');
 // 实例
 const app = new Koa();
 const router = new Router();
@@ -32,13 +32,18 @@ app.use(
     },
   })
 );
-app.context.linkList = [];
+app.context.linkMap = new Map();
 let j = schedule.scheduleJob('*/60 * * * *', () => {
-  app.context.linkList = [];
+  app.context.linkMap = new Map();
 });
 // 装载所有路由并且分类
 router.use('/server', server.routes(), server.allowedMethods());
 router.use('/t', tiny.routes(), tiny.allowedMethods());
 app.use(router.routes()).use(router.allowedMethods());
+// 错误监控
+app.on('error', async (err, ctx) => {
+  console.error('Server Error------------------: ', err);
+  sReportErrorInfo({ ctx, logType: 'server_error', err, url: '', alias: 'pigKey' });
+});
 // 监听端口
 app.listen(3224);

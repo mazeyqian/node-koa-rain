@@ -35,7 +35,7 @@ async function sIsExistContent ({ content }) {
  * @method sReportErrorInfo
  * @description 发送通用报错日志
  * @param {Object} ctx 上下文
- * @param {String} logType 日志类型 unknown_error server_error js_error
+ * @param {String} logType 日志类型 unknown_error server_error js_error request_error
  * @param {Object} err 错误对象
  * @param {String} pageTitle 页面标题 Title
  * @param {String} url 链接
@@ -43,6 +43,11 @@ async function sIsExistContent ({ content }) {
  * @return {Object} 是否正确上报
  * */
 async function sReportErrorInfo ({ ctx, logType = 'unknown_error', err = {}, pageTitle = '', url = '', alias = 'orangeKey' } = {}) {
+  let requestUrl = '';
+  if (ctx.request && ctx.request.url && ctx.request.header) {
+    url = `${ctx.request.header.host}${ctx.request.url}`;
+  }
+  url = url || requestUrl;
   // 要旨 摘要 栈
   let { message = '', stack = '' } = err;
   let errContent = `\`#错误日志\` \`#${logType}\``;
@@ -65,7 +70,7 @@ async function sReportErrorInfo ({ ctx, logType = 'unknown_error', err = {}, pag
     errContent += `\n堆栈：<font color=comment>${stack}</font>`;
   }
   if (errContent.length >= 4000) {
-    errContent = errContent.substr(0, 4000);
+    errContent = errContent.substring(0, 4000);
   }
   // 机器人提醒
   const GetRobotKeyByAliasRes = sGetRobotKeyByAlias({ alias });
