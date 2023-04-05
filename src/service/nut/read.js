@@ -5,7 +5,7 @@ const { mAddWiki, mGetWikis, mGetAllWikis, mGetWikiIntegral } = require('../../m
 const { format, isSameDay } = require('date-fns');
 const { genBookName } = require('../../utils/utils');
 const { isNumber } = require('mazey');
-const { alias2Key } = require('../../config/env.development');
+const { readKey } = require('../robot/robotsConf');
 const { sRobotSendNews } = require('../robot/robot');
 const { sAddNewUser } = require('../user');
 const { sRobotSendColorText } = require('../robot');
@@ -43,7 +43,7 @@ async function sPunchCard (ctx) {
       if (accumulative_count === 1) {
         sRobotSendColorText({
           message: `〈😃ノ 欢迎 ${nick_name} 加入小兔读书会 🎉🎉🎉`,
-          key: alias2Key.get('readKey'),
+          key: readKey,
           immediately: true,
         });
       }
@@ -69,7 +69,7 @@ async function sPunchCard (ctx) {
         }
         sRobotSendColorText({
           message: `${nick_name} 已经连续读书 ${max_continuous_count} 天啦！获得成就【${achievement}】${emojiGroup}${contentSuffix}`,
-          key: alias2Key.get('readKey'),
+          key: readKey,
           immediately: true,
         });
       }
@@ -162,7 +162,7 @@ async function sRobotSend ({ read_card_date, nick_name, book_name, content, img,
     description: content || '',
     url: 'https://tool.mazey.net/rabbit-read/?from=robot#/home',
     picurl: img || 'https://i.mazey.net/asset/read/rabbitReadBanner-534x228.jpg',
-    key: alias2Key.get('readKey'),
+    key: readKey,
     immediately: true,
   });
 }

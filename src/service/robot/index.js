@@ -2,7 +2,7 @@
 const schedule = require('node-schedule');
 const axios = require('axios');
 const { isSameDay } = require('date-fns');
-const { alias2Key } = require('./../../config/env.development');
+const { alias2Key } = require('./robotsConf');
 const { err } = require('../../entities/error');
 const { rsp } = require('../../entities/response');
 const { dayOffDates } = require('./dayOffConf');

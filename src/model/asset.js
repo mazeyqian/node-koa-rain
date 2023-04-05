@@ -55,8 +55,15 @@ const MazeyAsset = sqlIns.define(
 MazeyAsset.sync();
 
 // 新增上传资源
-async function newAsset ({ asset_link, asset_oss_id, asset_file_name, asset_show_link, asset_oss_link, asset_target, asset_type, asset_size, asset_operator_id, user_id }) {
-  return MazeyAsset.create({ asset_link, asset_oss_id: user_id || asset_oss_id, asset_file_name, asset_show_link, asset_oss_link, asset_target, asset_type, asset_size, asset_operator_id }).catch(
+async function newAsset ({ asset_link, asset_oss_id, asset_file_name, asset_show_link, asset_oss_link, asset_target, asset_type, asset_size, asset_operator_id, token }) {
+  const GetUserNameByPasswordRes = await mGetUserNameByPassword({ user_password: token });
+  if (GetUserNameByPasswordRes.ret !== 0) {
+    return GetUserNameByPasswordRes;
+  }
+  const {
+    data: { userId },
+  } = GetUserNameByPasswordRes;
+  return MazeyAsset.create({ asset_link, asset_oss_id: userId || asset_oss_id, asset_file_name, asset_show_link, asset_oss_link, asset_target, asset_type, asset_size, asset_operator_id }).catch(
     console.error
   );
 }
