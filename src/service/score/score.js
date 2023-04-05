@@ -30,6 +30,8 @@ async function sAddNewScore (ctx, { game_id, score, start, remark }) {
       user_name: jwtToken.data.user_name,
     });
     return addNewGameRes;
+  } else {
+    return queryGameRes;
   }
 }
 module.exports = {
