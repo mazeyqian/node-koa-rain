@@ -3,7 +3,7 @@ const { rsp } = require('../entities/response');
 const { updateCodeStatus, acquireNotExpireCode } = require('../model/code');
 const axios = require('axios');
 const nodemailer = require('nodemailer');
-const { $email_name, $email_key } = require('../secret/email');
+const { $email_name, $email_key } = require('../config/env.development');
 // 校验邮箱
 async function sUpdateCodeStatus (ctx, user_email, code) {
   const updateCodeStatusRes = await updateCodeStatus({

@@ -7,7 +7,6 @@ const { mGetOSSConfs, mNewOSSConf, mNewGetOSSConfs, mAddOSSConf } = require('../
 // const { ossPut, ossMultipartUpload } = require('./alioss');
 const { sGetUid } = require('../user');
 const { err } = require('../../entities/err');
-const { jwtVerify } = require('../../entities/jwt');
 const { isNumber } = require('mazey');
 const { format } = require('date-fns');
 const mkdir = require('../../utils/mkdir');
@@ -15,15 +14,8 @@ const { assetsBaseUrl } = require('../../config/index');
 // 上传单个文件
 async function upload (ctx) {
   // 对token进行解码
-  let userToken = ctx.request.header.usertoken;
-  let jwtToken = jwtVerify(userToken);
-  console.log('userToken', userToken, jwtToken);
-  if (jwtToken.code !== 2) {
-    return rsp({
-      message: '用户登陆过期,请重新登陆',
-      data: {},
-    });
-  }
+  console.log('ctx', ctx.state.user);
+  const jwtToken = ctx.state.user;
   const file = ctx.request.files.file; // 获取上传文件
   if (!file.type) {
     return rsp({

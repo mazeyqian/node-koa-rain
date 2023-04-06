@@ -12,6 +12,7 @@ const mkdir = require('./utils/mkdir');
 const NODE_ENV = process.env.NODE_ENV; // development production
 let schedule = require('node-schedule');
 const { sReportErrorInfo } = require('./service/log');
+const { authMiddleware } = require('./entities/jwt/index');
 // 实例
 const app = new Koa();
 const router = new Router();
@@ -21,6 +22,7 @@ const router = new Router();
 mkdir.mkdirs('temp', err => {
   console.log('err', err); // 错误的话，直接打印如果地址跟
 });
+app.use(authMiddleware);
 // 上传文件
 app.use(
   koaBody({
