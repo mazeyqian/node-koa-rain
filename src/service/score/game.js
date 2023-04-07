@@ -1,6 +1,6 @@
 const { err } = require('../../entities/err');
 const { rsp } = require('../../entities/response');
-const { addNewGame } = require('../../model/game');
+const { addNewGame, queryAllGame } = require('../../model/game');
 const axios = require('axios');
 // 增加游戏
 async function sAddNewGame (ctx, { game_name, game_english_name, game_type, game_picture, game_content, game_publisher = '', game_release_time = '' }) {
@@ -21,6 +21,12 @@ async function sAddNewGame (ctx, { game_name, game_english_name, game_type, game
   });
   return addNewGameRes;
 }
+// 查询所有游戏
+async function sQueryAllGame (ctx) {
+  const queryAllGameRes = await queryAllGame();
+  return queryAllGameRes;
+}
 module.exports = {
   sAddNewGame,
+  sQueryAllGame,
 };

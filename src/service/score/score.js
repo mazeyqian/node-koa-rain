@@ -1,6 +1,6 @@
 const { err } = require('../../entities/err');
 const { rsp } = require('../../entities/response');
-const { addNewScore } = require('../../model/score');
+const { addNewScore, queryAllScore } = require('../../model/score');
 const { queryUpdateGame } = require('../../model/game');
 // 增加游戏评分 (评分的时候需要对游戏表的分数进行处理)
 async function sAddNewScore (ctx, { game_id, score, start, remark }) {
@@ -25,6 +25,12 @@ async function sAddNewScore (ctx, { game_id, score, start, remark }) {
     return queryGameRes;
   }
 }
+// 查询所有游戏
+async function sQueryAllScore (ctx, { game_id }) {
+  const queryAllScoreRes = await queryAllScore({ game_id });
+  return queryAllScoreRes;
+}
 module.exports = {
   sAddNewScore,
+  sQueryAllScore,
 };

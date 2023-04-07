@@ -13,7 +13,7 @@ const MazeyGame = sqlIns.define(
       autoIncrement: true,
     },
     game_picture: {
-      type: DataTypes.STRING(50),
+      type: DataTypes.STRING(500),
     },
     game_star: {
       type: DataTypes.FLOAT,
@@ -90,9 +90,16 @@ async function queryUpdateGame ({ game_id }) {
   }
   return rsp({ data: ret.dataValues });
 }
+// 查询所有游戏
+async function queryAllGame () {
+  const ret = await MazeyGame.findAll().catch(console.error);
+  console.log('ret', ret);
+  return rsp({ data: ret });
+}
 MazeyGame.sync();
 
 module.exports = {
   addNewGame,
   queryUpdateGame,
+  queryAllGame,
 };

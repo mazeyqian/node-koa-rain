@@ -64,6 +64,18 @@ async function addNewScore ({ game_id, game_name, score, start, remark, user_id,
   }
   return err();
 }
+// 根据游戏查询游戏下的所有评分
+async function queryAllScore ({ game_id }) {
+  console.log('game_id----------------------------------', game_id);
+  const ret = await MazeyScore.findAll({
+    where: {
+      game_id,
+    },
+  }).catch(console.error);
+  console.log('ret-----------', ret);
+  return rsp({ data: ret });
+}
 module.exports = {
   addNewScore,
+  queryAllScore,
 };

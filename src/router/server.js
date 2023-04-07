@@ -29,8 +29,8 @@ const { WeatherConf } = require('./../config/index');
 const { sGetRobotKeyByAlias } = require('../service/robot');
 const { sGetWeatherDaily } = require('../service/weather');
 const { sGetToken, sGetTicket } = require('../service/weixin');
-const { sAddNewGame } = require('../service/score/game');
-const { sAddNewScore } = require('../service/score/score');
+const { sAddNewGame, sQueryAllGame } = require('../service/score/game');
+const { sAddNewScore, sQueryAllScore } = require('../service/score/score');
 const weatherIns = new WeatherApi(WeatherConf.UID, WeatherConf.KEY);
 
 server
@@ -224,9 +224,17 @@ server
     const obj = ctx.request.body;
     ctx.body = await sAddNewGame(ctx, { ...obj });
   })
+  .post('/game/query', async ctx => {
+    ctx.body = await sQueryAllGame(ctx);
+  })
   .post('/score/add', async ctx => {
     const obj = ctx.request.body;
     ctx.body = await sAddNewScore(ctx, { ...obj });
+  })
+
+  .post('/score/query', async ctx => {
+    const { game_id } = ctx.request.body;
+    ctx.body = await sQueryAllScore(ctx, { game_id });
   });
 
 module.exports = server;
