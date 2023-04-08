@@ -13,7 +13,7 @@ const MazeyGame = sqlIns.define(
       autoIncrement: true,
     },
     game_picture: {
-      type: DataTypes.STRING(500),
+      type: DataTypes.STRING(200),
     },
     game_star: {
       type: DataTypes.FLOAT,
