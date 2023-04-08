@@ -19,13 +19,15 @@ const WeatherConf = {
   UID,
   KEY,
 };
+const $email_name = '18756272368@163.com'; // Server
+const $email_key = 'NKPJLZONGEDXSYVP'; // User
 // Alias key集合
 const alias2Key = new Map([
   // 小兔子 Rabbit Daily
   ['rabbitKey', '#rabbit'],
   // 小橘子 Orange Error 错误监控
   ['orangeKey', '#rabbit'],
-  ['pigKey', '#rabbit'],
+  ['pigKey', '4e247f84-2d1e-4480-8bb5-915642d90cf0'],
   ['testCarKey', '#rabbit'],
   ['strongerKey', '#rabbit'],
   ['forumFEHelperKey', '#rabbit'],
@@ -46,4 +48,6 @@ module.exports = {
   mysqlConf,
   WeatherConf,
   alias2Key,
+  $email_name,
+  $email_key,
 };
