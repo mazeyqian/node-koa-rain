@@ -90,6 +90,31 @@ async function queryUpdateGame ({ game_id }) {
   }
   return rsp({ data: ret.dataValues });
 }
+async function mUpdateGame ({ data }, score) {
+  console.log('data', data, score);
+  const scoreData = score.data;
+  let game_score_personnel = data.game_score_personnel + 1;
+  let game_score = (data.game_score * data.game_score_personnel + scoreData.score) / game_score_personnel;
+  game_score = game_score.toFixed(1);
+  let game_star = 5;
+  let game_id = data.game_id;
+  const ret = await MazeyGame.update(
+    {
+      game_score,
+      game_star,
+      game_score_personnel,
+    },
+    {
+      where: {
+        game_id,
+      },
+    }
+  ).catch(console.error);
+  if (!ret) {
+    return err({ message: '该游戏不存在' });
+  }
+  return rsp({ data: ret.dataValues });
+}
 // 查询所有游戏
 async function queryAllGame () {
   const ret = await MazeyGame.findAll().catch(console.error);
@@ -102,4 +127,5 @@ module.exports = {
   addNewGame,
   queryUpdateGame,
   queryAllGame,
+  mUpdateGame,
 };

@@ -26,7 +26,7 @@ const MazeyScore = sqlIns.define(
       type: DataTypes.STRING(50),
     },
     start: {
-      // 1-5星支持小数
+      // 1-5星支持小数0.5的倍数
       type: DataTypes.FLOAT,
     },
     score: {
@@ -66,13 +66,11 @@ async function addNewScore ({ game_id, game_name, score, start, remark, user_id,
 }
 // 根据游戏查询游戏下的所有评分
 async function queryAllScore ({ game_id }) {
-  console.log('game_id----------------------------------', game_id);
   const ret = await MazeyScore.findAll({
     where: {
       game_id,
     },
   }).catch(console.error);
-  console.log('ret-----------', ret);
   return rsp({ data: ret });
 }
 module.exports = {
