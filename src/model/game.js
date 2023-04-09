@@ -91,11 +91,11 @@ async function queryUpdateGame ({ game_id }) {
   return rsp({ data: ret.dataValues });
 }
 async function mUpdateGame ({ data }, score) {
-  console.log('data', data, score);
   const scoreData = score.data;
   let game_score_personnel = data.game_score_personnel + 1;
   let game_score = (data.game_score * data.game_score_personnel + scoreData.score) / game_score_personnel;
-  game_score = game_score.toFixed(1);
+  console.log('game_score', game_score);
+  game_score = game_score.toFixed(2);
   let game_star = 5;
   let game_id = data.game_id;
   const ret = await MazeyGame.update(

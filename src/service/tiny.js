@@ -2,7 +2,7 @@
 const md5 = require('md5');
 const { rsp } = require('../entities/response');
 const { convert26 } = require('../utils/utils');
-const { queryOriLink, saveOriLink, queryTinyLink, saveTinyLink } = require('../model/tiny');
+const { queryOriLink, saveOriLink, queryTinyLink, saveTinyLink, mUpdateTinyLink } = require('../model/tiny');
 const { tinyBaseUrl } = require('../config/index');
 
 // 生成短链接
@@ -34,6 +34,7 @@ async function sGenerateShortLink ({ ori_link }) {
 async function queryShortLink (ctx, { tiny_key }) {
   let { linkMap } = ctx;
   if (linkMap.has(tiny_key)) {
+    mUpdateTinyLink({ tiny_key });
     return rsp({
       data: {
         queryTinyLinkResut: {
@@ -44,8 +45,8 @@ async function queryShortLink (ctx, { tiny_key }) {
   }
   const queryTinyLinkResut = await queryTinyLink({ tiny_key });
   if (queryTinyLinkResut) {
-    console.log('执行了嘛');
     ctx.linkMap.set(tiny_key, queryTinyLinkResut.ori_link);
+    mUpdateTinyLink({ tiny_key });
   }
   return rsp({
     data: {
