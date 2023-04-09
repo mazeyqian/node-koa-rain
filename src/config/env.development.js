@@ -12,7 +12,7 @@ const mysqlConf = {
   $mysql_password,
   $mysql_database,
 };
-
+const pswSecret = 'mazey'; // 密码加密密钥
 const UID = '#rabbit'; // User ID
 const KEY = '#rabbit'; // Key
 const WeatherConf = {
@@ -50,4 +50,5 @@ module.exports = {
   alias2Key,
   $email_name,
   $email_key,
+  pswSecret,
 };
