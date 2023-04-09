@@ -4,6 +4,7 @@ const { err } = require('../entities/error');
 const { rsp } = require('../entities/response');
 const md5 = require('md5');
 const { jwtCreate } = require('../entities/jwt');
+const { pswSecret } = require('../config/index');
 const MazeyUser = sqlIns.define(
   'MazeyUser',
   {
@@ -126,7 +127,7 @@ async function mLogin ({ user_name, user_password }) {
 
 // 生成 Token
 function mGenToken ({ str }) {
-  return rsp({ data: { token: md5(`${str}+mazey`) } });
+  return rsp({ data: { token: md5(`${str}+${pswSecret}`) } });
 }
 // 获取用户Id（根据token密码）
 async function mGetUserIdByPassword ({ user_password }) {
