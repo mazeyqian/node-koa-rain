@@ -3,7 +3,8 @@ const { DataTypes, Op } = require('sequelize');
 const { err } = require('../entities/error');
 const { rsp } = require('../entities/response');
 const md5 = require('md5');
-
+const { jwtCreate } = require('../entities/jwt');
+const { pswSecret } = require('../config/index');
 const MazeyUser = sqlIns.define(
   'MazeyUser',
   {
@@ -112,19 +113,21 @@ async function mLogin ({ user_name, user_password }) {
   if (!ret) {
     return err({ message: '用户不存在' });
   }
+  console.log('ret', ret);
   const { user_password: realPassword } = ret;
   const {
     data: { token: requestPassword },
   } = mGenToken({ str: user_password });
   if (realPassword === requestPassword) {
-    return rsp({ data: { token: realPassword } });
+    let jwtToken = jwtCreate(ret.dataValues);
+    return rsp({ data: { token: realPassword, jwtToken: jwtToken } });
   }
   return err({ message: '密码错误' });
 }
 
 // 生成 Token
 function mGenToken ({ str }) {
-  return rsp({ data: { token: md5(`${str}+mazey`) } });
+  return rsp({ data: { token: md5(`${str}+${pswSecret}`) } });
 }
 // 获取用户Id（根据token密码）
 async function mGetUserIdByPassword ({ user_password }) {
@@ -146,7 +149,7 @@ async function mGetUserIdByPassword ({ user_password }) {
   return rsp({ data: { userId } });
 }
 
-// 获取用户名和id（根据密码）
+// 获取用户名和id（根据密码）2023319 弃用
 async function mGetUserNameByPassword ({ user_password }) {
   const ret = await MazeyUser.findOne({
     where: {

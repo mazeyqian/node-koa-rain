@@ -1,7 +1,6 @@
 const { getCityInfo } = require('./../service/ip');
 const { getLatestVisitors, sAgentGet, sAgentPut, sAgentAny, sShowRequestInfo } = require('./../service/visitor');
 const { upload, getAssets, sGetOSSConfs, sNewOSSConf, sRemoveAsset, sNewGetOSSConfs, sAddOSSConf } = require('./../service/upload');
-const { uploadFile } = require('./../service/upload/upload');
 const { report } = require('./../model/report');
 const { sGetUserInfo, sLogin, sGenToken, sAddNewUser } = require('./../service/user');
 const { sUpdateCodeStatus } = require('./../service/code');
@@ -20,7 +19,7 @@ const {
   sGetRecentAchievement,
 } = require('./../service/nut/read');
 const { sRobotRemindFeperf, sRobotSendText, sRobotRemindForCommonTag } = require('./../service/robot/robot');
-const { rabbitKey } = require('./../service/robot/robotsConf');
+const { alias2Key } = require('./../config/env.development');
 const { rsp } = require('./../entities/response');
 const { sAddLog, sReportErrorInfo } = require('./../service/log');
 const Router = require('koa-router');
@@ -30,6 +29,8 @@ const { WeatherConf } = require('./../config/index');
 const { sGetRobotKeyByAlias } = require('../service/robot');
 const { sGetWeatherDaily } = require('../service/weather');
 const { sGetToken, sGetTicket } = require('../service/weixin');
+const { sAddNewGame, sQueryAllGame } = require('../service/score/game');
+const { sAddNewScore, sQueryAllScore } = require('../service/score/score');
 const weatherIns = new WeatherApi(WeatherConf.UID, WeatherConf.KEY);
 
 server
@@ -64,7 +65,7 @@ server
   })
   .post('/robot/send-text', async ctx => {
     const { message } = ctx.request.body;
-    await sRobotSendText({ message, key: rabbitKey, immediately: true });
+    await sRobotSendText({ message, key: alias2Key.get('rabbitKey'), immediately: true });
     ctx.body = rsp();
   })
   .post('/robot/tags', async ctx => {
@@ -158,23 +159,6 @@ server
     const { ossName, region, accessKeyId, accessKeySecret, bucket, cdnDomain, userName } = ctx.request.body;
     ctx.body = await sAddOSSConf({ ossName, region, accessKeyId, accessKeySecret, bucket, cdnDomain, userName });
   })
-  // 单个文件上传
-  .post('/upload/single', uploadFile.single('file'), (req, res) => {
-    res.json({
-      code: 200,
-      msg: '上传成功!',
-      data: req.file,
-    });
-  })
-
-  // 多个文件上传
-  // .post('/upload/array', uploadFile.array('file'), (req, res) => {
-  //   res.json({
-  //     code: 200,
-  //     msg: '上传成功!',
-  //     data: req.file,
-  //   });
-  // })
   // Agent
   .get('/agent/get', async ctx => {
     ctx.body = await sAgentGet(ctx);
@@ -234,6 +218,23 @@ server
   })
   .get('/weixin/get-ticket', async ctx => {
     ctx.body = await sGetTicket();
+  })
+  // score
+  .post('/game/add', async ctx => {
+    const obj = ctx.request.body;
+    ctx.body = await sAddNewGame(ctx, { ...obj });
+  })
+  .post('/game/query', async ctx => {
+    ctx.body = await sQueryAllGame(ctx);
+  })
+  .post('/score/add', async ctx => {
+    const obj = ctx.request.body;
+    ctx.body = await sAddNewScore(ctx, { ...obj });
+  })
+
+  .post('/score/query', async ctx => {
+    const { game_id } = ctx.request.body;
+    ctx.body = await sQueryAllScore(ctx, { game_id });
   });
 
 module.exports = server;

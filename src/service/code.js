@@ -3,14 +3,13 @@ const { rsp } = require('../entities/response');
 const { updateCodeStatus, acquireNotExpireCode } = require('../model/code');
 const axios = require('axios');
 const nodemailer = require('nodemailer');
-
+const { $email_name, $email_key } = require('../config/env.development');
 // 校验邮箱
 async function sUpdateCodeStatus (ctx, user_email, code) {
   const updateCodeStatusRes = await updateCodeStatus({
     user_email,
     code,
   });
-  console.log('updateCodeStatusRes', updateCodeStatusRes);
   if (updateCodeStatusRes.ret !== 0) {
     return updateCodeStatusRes;
   }
@@ -34,8 +33,8 @@ async function sendMail (sendMail) {
     secure: true,
     auth: {
       // 发件人邮箱账号
-      user: '18756272368@163.com', // 发件人邮箱的授权码 这里可以通过qq邮箱获取 并且不唯一
-      pass: 'NKPJLZONGEDXSYVP', // 授权码生成之后，要等一会才能使用，否则验证的时候会报错
+      user: $email_name, // 发件人邮箱的授权码 这里可以通过qq邮箱获取 并且不唯一
+      pass: $email_key, // 授权码生成之后，要等一会才能使用，否则验证的时候会报错
     },
   };
   const transporter = nodemailer.createTransport(config);
@@ -43,7 +42,7 @@ async function sendMail (sendMail) {
   // 创建一个收件人对象
   const mail = {
     // 发件人 邮箱 '昵称<发件人邮箱>'
-    from: `18756272368@163.com`,
+    from: $email_name,
     // 主题
     subject: '邮箱校验通知',
     // 收件人 的邮箱

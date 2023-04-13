@@ -10,10 +10,13 @@ const { err } = require('../../entities/err');
 const { isNumber } = require('mazey');
 const { format } = require('date-fns');
 const mkdir = require('../../utils/mkdir');
+const { assetsBaseUrl } = require('../../config/index');
 // 上传单个文件
 async function upload (ctx) {
+  // 对token进行解码
+  console.log('ctx', ctx.state.user);
+  const jwtToken = ctx.state.user;
   const file = ctx.request.files.file; // 获取上传文件
-  console.log('file', file);
   if (!file.type) {
     return rsp({
       message: '请上传图片',
@@ -28,10 +31,9 @@ async function upload (ctx) {
   }
   let lastFileStr = fileStr[0] + '/' + typeStr;
   let fileUrl = 'assets/' + lastFileStr;
-  let res = await mkdir.mkdirs(fileUrl, err => {
+  await mkdir.mkdirs(fileUrl, err => {
     console.log('err', err); // 错误的话，直接打印如果地址跟
   });
-  console.log('res----------------------------------', res);
   const target = ctx.query.target || 'assets'; // 上传目录，默认 asset 生产https://i.mazey.net/assets/aaa.jpg  生产和开发区分/web/i.mazey.net/assets/aaa.jpg
   let uid = Number(ctx.query.uid) || 0;
   // 通过指纹拿到 uid
@@ -51,14 +53,19 @@ async function upload (ctx) {
   let fileName = file.name || 'upload';
   let pattern = new RegExp("[`~!@#$^&*()=|{}':;',\\[\\]<>《》/?~!@#￥……&*()——|{}【】‘;:”“'。,、? ]");
   if (pattern.test(fileName)) {
-    // 有特殊字符就去掉
+    // 有特殊字符或者汉字就去掉
     let rs = '';
     for (let i = 0; i < fileName.length; i++) {
       rs += fileName.substr(i, 1).replace(pattern, '');
     }
     fileName = rs;
   }
-  fileName = format(Date.now(), 'yyyy-MM-dd') + '-' + Math.round(Math.random() * 1e9) + '-' + fileName;
+  fileName = fileName.replace(/[\u4e00-\u9fa5]/g, a => {
+    console.log('a', a);
+    return 'i';
+  }); // 判断有汉字就进行unique
+  let fileArray = fileName.split('.');
+  fileName = fileArray[0] + '-' + format(Date.now(), 'yyyyMMdd') + '-' + Math.round(Math.random() * 1e9) + '.' + fileArray[fileArray.length - 1];
   let downloadFileUrl = `../../../../assets/${lastFileStr}/`;
   const filePath = path.join(__dirname, downloadFileUrl) + `${fileName}`;
   // 创建可写流
@@ -68,7 +75,7 @@ async function upload (ctx) {
   const status = new Promise(resolve => {
     ok = resolve;
   }, console.error);
-  let cdnDomain = process.env.NODE_ENV === 'development' ? 'http://localhost:8224/' : 'https://i.mazey.net/';
+  let cdnDomain = process.env.NODE_ENV === 'development' ? 'http://localhost:8224/' : `${assetsBaseUrl}/`;
   let ossResult = '';
   // 生成入库字段
   const assetLink = ''; // `https://mazey.cn/assets/${fileName}`;
@@ -84,7 +91,7 @@ async function upload (ctx) {
     asset_size: fileSize,
     asset_operator_id: uid,
     asset_file_name: fileName,
-    token: ctx.query.token,
+    user_id: jwtToken.data.user_id,
   });
   ok(
     rsp({

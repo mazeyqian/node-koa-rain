@@ -1,0 +1,3 @@
+{
+  "window.title": "Node.js${separator}${dirty}${activeEditorShort}${separator}${rootName}${separator}${profileName}${separator}${appName}"
+}

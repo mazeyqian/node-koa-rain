@@ -26,6 +26,9 @@ const MazeyTiny = sqlIns.define(
       // Key abcdef
       type: DataTypes.STRING(20),
     },
+    tiny_count: {
+      type: DataTypes.INTEGER,
+    },
   },
   {
     tableName: 'mazey_tiny',
@@ -38,11 +41,12 @@ MazeyTiny.sync();
 
 // 查询长链接 / 是否已生成过短链接
 async function queryOriLink ({ ori_md5 }) {
-  return MazeyTiny.findOne({
+  let queryOriLinkRes = MazeyTiny.findOne({
     where: {
       ori_md5,
     },
   }).catch(console.error);
+  return queryOriLinkRes;
 }
 
 // 保存长链接 / 返回 ID 用于生成短链接
@@ -74,10 +78,20 @@ async function queryTinyLink ({ tiny_key }) {
     },
   }).catch(console.error);
 }
+// 更新短链接访问次数
+async function mUpdateTinyLink ({ tiny_key }) {
+  console.log('wozhixinglewa', tiny_key);
+  return MazeyTiny.increment('tiny_count', {
+    where: {
+      tiny_key,
+    },
+  }).catch(console.error);
+}
 
 module.exports = {
   queryOriLink,
   saveOriLink,
   saveTinyLink,
   queryTinyLink,
+  mUpdateTinyLink,
 };
