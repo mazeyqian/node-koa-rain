@@ -32,7 +32,7 @@ const { sGetToken, sGetTicket } = require('../service/weixin');
 const { sAddNewGame, sQueryAllGame } = require('../service/score/game');
 const { sAddNewScore, sQueryAllScore } = require('../service/score/score');
 const weatherIns = new WeatherApi(WeatherConf.UID, WeatherConf.KEY);
-
+// 校验
 server
   // Ping
   .get('/ping', async ctx => {
