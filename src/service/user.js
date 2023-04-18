@@ -4,7 +4,7 @@ const { rsp } = require('../entities/response');
 const { getUid, acquireNewUser, mLogin, mGenToken } = require('../model/user');
 const { acquireNewCode } = require('../model/code');
 const { sendMail } = require('./code');
-const { emailRegExp, nickRegTest } = require('../utils/utils');
+const { emailRegExp } = require('../utils/utils');
 const WeatherApi = require('./weather/weather');
 const { WeatherConf } = require('../config/index');
 const weatherIns = new WeatherApi(WeatherConf.UID, WeatherConf.KEY);
@@ -115,7 +115,7 @@ async function sAddNewUser (ctx, nick_name, real_name = '', user_password = '', 
         }
       }),
   });
-  const { error, value } = schema.validate({
+  const { error } = schema.validate({
     nick_name: nick_name,
   });
   if (error) {
