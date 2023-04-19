@@ -1,6 +1,7 @@
 const { err } = require('../../entities/err');
 const { rsp } = require('../../entities/response');
 const { mAddNewTags } = require('../../model/tag');
+const { mAddNewGameTags } = require('../../model/game');
 const Joi = require('joi');
 // 批量增加标签,主要判重
 async function sAddNewTags (ctx, { game_id, tag_name }) {
@@ -9,14 +10,9 @@ async function sAddNewTags (ctx, { game_id, tag_name }) {
       .integer()
       .required()
       .error(new Error('请选择游戏')),
-    tag_name: Joi.string()
-      .required()
-      .max(10)
-      .error(new Error('游戏标签最多10')),
   });
   const { error } = schema.validate({
     game_id,
-    tag_name,
   });
   if (error) {
     return err({ message: error.message });
@@ -26,7 +22,14 @@ async function sAddNewTags (ctx, { game_id, tag_name }) {
     game_id,
     tag_name,
   });
-  console.log('mAddNewTagsRes', mAddNewTagsRes);
+  // const tagInstances = tags.map((tag) => tag[0]);
+  console.log('mAddNewTagsRes', mAddNewTagsRes.data);
+  if (mAddNewTagsRes.data) {
+    const mAddNewGameTagsRes = await mAddNewGameTags({
+      game_id,
+      data: mAddNewTagsRes.data,
+    });
+  }
   return mAddNewTagsRes;
 }
 module.exports = {

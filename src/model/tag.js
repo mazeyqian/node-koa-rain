@@ -30,12 +30,17 @@ const MazeyTag = sqlIns.define(
 );
 // 查询所有游戏
 async function mAddNewTags ({ game_id, tag_name }) {
-  let param = tag_name;
-  const ret = await MazeyTag.bulkCreate(param, {
-    updateOnDuplicate: ['tag_name'],
-  });
-  console.log('ret', ret);
-  return rsp({ data: [] });
+  console.log('tag_name', tag_name);
+  const tags = await Promise.all(
+    tag_name.map(name => {
+      return MazeyTag.findOrCreate({ where: { tag_name: name } });
+    })
+  );
+  // const ret = await MazeyTag.bulkCreate(param, {
+  //   updateOnDuplicate: ['tag_name'],
+  // });
+  console.log('tags', tags);
+  return rsp({ data: tags });
 }
 MazeyTag.sync();
 module.exports = {

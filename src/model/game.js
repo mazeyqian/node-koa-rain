@@ -2,7 +2,8 @@ const { sqlIns } = require('../entities/orm');
 const { DataTypes } = require('sequelize');
 const { rsp } = require('../entities/response');
 const { err } = require('../entities/error');
-
+const { MazeyTag } = require('./tag');
+const { MazeyGameTag } = require('./gameTag');
 const MazeyGame = sqlIns.define(
   'MazeyGame',
   {
@@ -121,10 +122,27 @@ async function queryAllGame () {
   console.log('ret', ret);
   return rsp({ data: ret });
 }
+// 给游戏增加标签
+async function mAddNewGameTags ({ game_id, data }) {
+  const ret = await MazeyGame.findOne({
+    where: {
+      game_id,
+    },
+  }).catch(console.error);
+  if (!ret) {
+    return err({ message: '该游戏不存在' });
+  }
+  let tagIds = data.map(item => item[0].tag_id);
+  console.log('tagIds', tagIds);
+  ret.addMazeyTags(tagIds, { through: { unique: true } });
+}
 MazeyGame.sync();
+MazeyGame.belongsToMany(MazeyTag, { through: MazeyGameTag, foreignKey: 'game_id', otherKey: 'tag_id' });
+MazeyTag.belongsToMany(MazeyGame, { through: MazeyGameTag, foreignKey: 'tag_id', otherKey: 'game_id' });
 module.exports = {
   addNewGame,
   queryUpdateGame,
   queryAllGame,
   mUpdateGame,
+  mAddNewGameTags,
 };

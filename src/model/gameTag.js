@@ -17,8 +17,6 @@ const MazeyGameTag = sqlIns.define(
   }
 );
 MazeyGameTag.sync();
-MazeyGame.belongsToMany(MazeyTag, { through: MazeyGameTag, foreignKey: 'game_id', otherKey: 'tag_id' });
-MazeyTag.belongsToMany(MazeyGame, { through: MazeyGameTag, foreignKey: 'tag_id', otherKey: 'game_id' });
 module.exports = {
   MazeyGameTag,
 };

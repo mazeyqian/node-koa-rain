@@ -31,6 +31,7 @@ const { sGetWeatherDaily } = require('../service/weather');
 const { sGetToken, sGetTicket } = require('../service/weixin');
 const { sAddNewGame, sQueryAllGame } = require('../service/score/game');
 const { sAddNewScore, sQueryAllScore } = require('../service/score/score');
+const { sAddNewTags } = require('../service/score/tag');
 const weatherIns = new WeatherApi(WeatherConf.UID, WeatherConf.KEY);
 // 校验
 server
@@ -234,6 +235,11 @@ server
   .post('/score/query', async ctx => {
     const { game_id } = ctx.request.body;
     ctx.body = await sQueryAllScore(ctx, { game_id });
+  })
+
+  .post('/tag/add', async ctx => {
+    const { game_id, tag_name } = ctx.request.body;
+    ctx.body = await sAddNewTags(ctx, { game_id, tag_name });
   });
 
 module.exports = server;
