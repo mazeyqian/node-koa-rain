@@ -231,7 +231,6 @@ server
     const obj = ctx.request.body;
     ctx.body = await sAddNewScore(ctx, { ...obj });
   })
-
   .post('/score/query', async ctx => {
     const { game_id } = ctx.request.body;
     ctx.body = await sQueryAllScore(ctx, { game_id });

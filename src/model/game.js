@@ -2,8 +2,6 @@ const { sqlIns } = require('../entities/orm');
 const { DataTypes } = require('sequelize');
 const { rsp } = require('../entities/response');
 const { err } = require('../entities/error');
-const { MazeyGameTag } = require('./gameTag');
-const { MazeyTag } = require('./tag');
 
 const MazeyGame = sqlIns.define(
   'MazeyGame',
@@ -124,8 +122,6 @@ async function queryAllGame () {
   return rsp({ data: ret });
 }
 MazeyGame.sync();
-MazeyGame.belongsToMany(MazeyTag, { through: MazeyGameTag });
-MazeyTag.belongsToMany(MazeyGame, { through: MazeyGameTag });
 module.exports = {
   addNewGame,
   queryUpdateGame,

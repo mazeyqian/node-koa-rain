@@ -13,9 +13,13 @@ const MazeyTag = sqlIns.define(
     },
     tag_name: {
       type: DataTypes.STRING(200),
+      unique: true,
     },
     tag_description: {
       type: DataTypes.STRING(200),
+    },
+    user_id: {
+      type: DataTypes.INTEGER,
     },
   },
   {
@@ -24,7 +28,17 @@ const MazeyTag = sqlIns.define(
     updatedAt: 'update_at',
   }
 );
+// 查询所有游戏
+async function mAddNewTags ({ game_id, tag_name }) {
+  let param = tag_name;
+  const ret = await MazeyTag.bulkCreate(param, {
+    updateOnDuplicate: ['tag_name'],
+  });
+  console.log('ret', ret);
+  return rsp({ data: [] });
+}
 MazeyTag.sync();
 module.exports = {
   MazeyTag,
+  mAddNewTags,
 };
