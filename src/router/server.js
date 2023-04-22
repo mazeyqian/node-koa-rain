@@ -29,7 +29,7 @@ const { WeatherConf } = require('./../config/index');
 const { sGetRobotKeyByAlias } = require('../service/robot');
 const { sGetWeatherDaily } = require('../service/weather');
 const { sGetToken, sGetTicket } = require('../service/weixin');
-const { sAddNewGame, sQueryAllGame } = require('../service/score/game');
+const { sAddNewGame, sQueryAllGame, sQueryGame } = require('../service/score/game');
 const { sAddNewScore, sQueryAllScore } = require('../service/score/score');
 const { sAddNewTags } = require('../service/score/tag');
 const weatherIns = new WeatherApi(WeatherConf.UID, WeatherConf.KEY);
@@ -225,8 +225,11 @@ server
     const obj = ctx.request.body;
     ctx.body = await sAddNewGame(ctx, { ...obj });
   })
-  .post('/game/query', async ctx => {
+  .post('/game/get-list', async ctx => {
     ctx.body = await sQueryAllGame(ctx);
+  })
+  .get('/game/query', async ctx => {
+    ctx.body = await sQueryGame(ctx, { game_id: ctx.query.id });
   })
   .post('/score/add', async ctx => {
     const obj = ctx.request.body;
@@ -236,7 +239,6 @@ server
     const { game_id } = ctx.request.body;
     ctx.body = await sQueryAllScore(ctx, { game_id });
   })
-
   .post('/tag/add', async ctx => {
     const { game_id, tag_name } = ctx.request.body;
     ctx.body = await sAddNewTags(ctx, { game_id, tag_name });

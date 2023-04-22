@@ -321,7 +321,7 @@ async function sRobotRemindForCommonTag ({ ctx, tags = [], contents = [], extra 
   // Repeat - begin
   if (repeat) {
     repeatSend(() => {
-      sRobotRemindForCommonTag({ ctx, tags, contents, extra, key: '', alias: 'TestUrl', repeat: false });
+      sRobotRemindForCommonTag({ ctx, tags, contents, extra, key: '', alias: 'pigKey', repeat: false });
     });
   }
   // Repeat - end

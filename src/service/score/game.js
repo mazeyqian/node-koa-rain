@@ -1,6 +1,6 @@
 const { err } = require('../../entities/err');
 const { rsp } = require('../../entities/response');
-const { addNewGame, queryAllGame } = require('../../model/game');
+const { addNewGame, queryAllGame, queryUpdateGame } = require('../../model/game');
 const axios = require('axios');
 const Joi = require('joi');
 // 增加游戏
@@ -39,7 +39,14 @@ async function sQueryAllGame (ctx) {
   const queryAllGameRes = await queryAllGame();
   return queryAllGameRes;
 }
+// 查询单个游戏
+async function sQueryGame (ctx, { game_id }) {
+  console.log(ctx);
+  const queryGameRes = await queryUpdateGame({ game_id });
+  return queryGameRes;
+}
 module.exports = {
   sAddNewGame,
   sQueryAllGame,
+  sQueryGame,
 };
