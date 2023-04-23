@@ -2,7 +2,7 @@ const { err } = require('../../entities/err');
 const { rsp } = require('../../entities/response');
 const { mAddNewTags } = require('../../model/tag');
 const { mAddNewGameTags } = require('../../model/game');
-const { sRobotRemindForCommonTag } = require('../../service/robot/robot');
+const { sRobotRemindForConfirmTag } = require('../../service/robot/robot');
 const Joi = require('joi');
 // 批量增加标签,主要判重
 async function sAddNewTags (ctx, { game_id, tag_name }) {
@@ -34,25 +34,26 @@ async function sAddNewTags (ctx, { game_id, tag_name }) {
   let params = {
     ctx,
     key: '',
-    alias: 'communityFEServerErrorUrl',
-    tags: ['社区报错', '4563333333'],
+    alias: 'pigKey',
+    tags: ['标签添加'],
+    tagList: tagData,
     contents: [
       {
         name: 'host',
-        value: '2333222221223334111',
+        value: 'localhost:3224',
       },
       {
         name: 'url',
-        value: '2333222',
+        value: '/server/tag/add',
       },
       {
         name: 'env',
-        value: '2222',
+        value: process.env.NODE_ENV,
       },
     ],
   };
-  console.log('mAddNewTagsRes', mAddNewTagsRes.data);
-  const RobotRemindForCommonTagRes = await sRobotRemindForCommonTag({ ...params });
+  const robotRemindForConfirmTagRes = await sRobotRemindForConfirmTag({ ...params });
+  console.log('mAddNewTagsRes', mAddNewTagsRes.data, robotRemindForConfirmTagRes);
   if (mAddNewTagsRes.data) {
     const mAddNewGameTagsRes = await mAddNewGameTags({
       game_id,
