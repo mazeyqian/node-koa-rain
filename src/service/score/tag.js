@@ -4,8 +4,9 @@ const { mAddNewTags } = require('../../model/tag');
 const { mAddNewGameTags } = require('../../model/game');
 const { sRobotRemindForConfirmTag } = require('../../service/robot/robot');
 const Joi = require('joi');
-async function sIsAddNewTags (ctx, { user_id, game_id, tag_name }) {
+async function sIsAddNewTags (ctx, { user_id, user_name, game_id, tag_name }) {
   const jwtToken = ctx.state.user;
+  console.log('jwtToken', jwtToken);
   let params = {
     ctx,
     key: '',
@@ -13,6 +14,7 @@ async function sIsAddNewTags (ctx, { user_id, game_id, tag_name }) {
     tags: ['标签添加'],
     tagList: tag_name,
     user_id: user_id || (jwtToken && jwtToken.data ? jwtToken.data.user_id : ''),
+    user_name: user_name || (jwtToken && jwtToken.data ? jwtToken.data.user_name : ''),
     game_id,
     contents: [
       {
@@ -34,7 +36,7 @@ async function sIsAddNewTags (ctx, { user_id, game_id, tag_name }) {
   return robotRemindForConfirmTagRes;
 }
 // 批量增加标签,主要判重
-async function sAddNewTags (ctx, { user_id, game_id, tag_name }) {
+async function sAddNewTags (ctx, { user_id, user_name, game_id, tag_name }) {
   console.log('tag_name', typeof tag_name);
   const schema = Joi.object({
     game_id: Joi.number()
@@ -55,6 +57,7 @@ async function sAddNewTags (ctx, { user_id, game_id, tag_name }) {
   console.log('user_id', user_id);
   const mAddNewTagsRes = await mAddNewTags({
     user_id: user_id || (jwtToken && jwtToken.data ? jwtToken.data.user_id : ''),
+    user_name: user_name || (jwtToken && jwtToken.data ? jwtToken.data.user_name : ''),
     game_id,
     tag_name,
   });

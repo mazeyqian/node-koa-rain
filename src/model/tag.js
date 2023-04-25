@@ -21,6 +21,9 @@ const MazeyTag = sqlIns.define(
     user_id: {
       type: DataTypes.INTEGER,
     },
+    user_name: {
+      type: DataTypes.STRING(20),
+    },
   },
   {
     tableName: 'mazey_tag',
@@ -29,13 +32,14 @@ const MazeyTag = sqlIns.define(
   }
 );
 // 查询所有游戏
-async function mAddNewTags ({ user_id, game_id, tag_name }) {
+async function mAddNewTags ({ user_id, user_name, game_id, tag_name }) {
   console.log('tag_name', tag_name);
   const tags = await Promise.all(
     tag_name.map(name => {
       return MazeyTag.findOrCreate({
         where: { tag_name: name },
         defaults: {
+          user_name: user_name || '系统',
           user_id: user_id || 1,
         },
       });

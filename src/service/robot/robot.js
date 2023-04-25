@@ -316,11 +316,11 @@ async function sRobotRemindFeperf (ctx) {
  * @method sRobotRemindForConfirmTag
  * @desc 增加标签人工企业微信人工审核
  */
-async function sRobotRemindForConfirmTag ({ ctx, user_id, game_id, tags = [], tagList = [], contents = [], extra = {}, key = '', alias = '', repeat = true } = {}) {
+async function sRobotRemindForConfirmTag ({ ctx, user_id, user_name, game_id, tags = [], tagList = [], contents = [], extra = {}, key = '', alias = '', repeat = true } = {}) {
   // Repeat - begin
   if (repeat) {
     repeatSend(() => {
-      sRobotRemindForConfirmTag({ ctx, tags, contents, extra, key: '', alias: 'TestUrl', repeat: false });
+      sRobotRemindForConfirmTag({ ctx, user_id, user_name, tags, tagList, contents, extra, key: '', alias: 'TestUrl', repeat: false });
     });
   }
   // Repeat - end
@@ -369,7 +369,7 @@ async function sRobotRemindForConfirmTag ({ ctx, user_id, game_id, tags = [], ta
       if (contents[0].name === 'host' && contents[1].name === 'url') {
         console.log('user_id-----------------------------', user_id);
         let tag_name = tagList.join(',');
-        link = `${contents[0].value}${contents[1].value}?user_id=${user_id}&game_id=${game_id}&tag_name=${tag_name}`;
+        link = `${contents[0].value}${contents[1].value}?user_id=${user_id}&user_name=${user_name}&game_id=${game_id}&tag_name=${tag_name}`;
       }
     }
     if (tagList.length) {
