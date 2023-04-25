@@ -4,39 +4,16 @@ const { mAddNewTags } = require('../../model/tag');
 const { mAddNewGameTags } = require('../../model/game');
 const { sRobotRemindForConfirmTag } = require('../../service/robot/robot');
 const Joi = require('joi');
-// 批量增加标签,主要判重
-async function sAddNewTags (ctx, { game_id, tag_name }) {
-  const schema = Joi.object({
-    game_id: Joi.number()
-      .integer()
-      .required()
-      .error(new Error('请选择游戏')),
-  });
-  const { error } = schema.validate({
-    game_id,
-  });
-  if (error) {
-    return err({ message: error.message });
-  }
+async function sIsAddNewTags (ctx, { user_id, game_id, tag_name }) {
   const jwtToken = ctx.state.user;
-  const mAddNewTagsRes = await mAddNewTags({
-    game_id,
-    tag_name,
-  });
-  // const tagInstances = tags.map((tag) => tag[0]);
-  let tagData = mAddNewTagsRes.data;
-  // let tagIds = tagData.map(item => {
-  //   return {
-  //     value: item[0].tag_id,
-  //     name: item[0].tag_name
-  //   }
-  // })
   let params = {
     ctx,
     key: '',
     alias: 'pigKey',
     tags: ['标签添加'],
-    tagList: tagData,
+    tagList: tag_name,
+    user_id: user_id || (jwtToken && jwtToken.data ? jwtToken.data.user_id : ''),
+    game_id,
     contents: [
       {
         name: 'host',
@@ -53,7 +30,35 @@ async function sAddNewTags (ctx, { game_id, tag_name }) {
     ],
   };
   const robotRemindForConfirmTagRes = await sRobotRemindForConfirmTag({ ...params });
-  console.log('mAddNewTagsRes', mAddNewTagsRes.data, robotRemindForConfirmTagRes);
+  console.log('mAddNewTagsRes', robotRemindForConfirmTagRes);
+  return robotRemindForConfirmTagRes;
+}
+// 批量增加标签,主要判重
+async function sAddNewTags (ctx, { user_id, game_id, tag_name }) {
+  console.log('tag_name', typeof tag_name);
+  const schema = Joi.object({
+    game_id: Joi.number()
+      .integer()
+      .required()
+      .error(new Error('请选择游戏')),
+  });
+  const { error } = schema.validate({
+    game_id,
+  });
+  if (typeof tag_name === 'string') {
+    tag_name = tag_name.split(',');
+  }
+  if (error) {
+    return err({ message: error.message });
+  }
+  const jwtToken = ctx.state.user;
+  console.log('user_id', user_id);
+  const mAddNewTagsRes = await mAddNewTags({
+    user_id: user_id || (jwtToken && jwtToken.data ? jwtToken.data.user_id : ''),
+    game_id,
+    tag_name,
+  });
+  let tagData = mAddNewTagsRes.data;
   if (mAddNewTagsRes.data) {
     const mAddNewGameTagsRes = await mAddNewGameTags({
       game_id,
@@ -63,5 +68,6 @@ async function sAddNewTags (ctx, { game_id, tag_name }) {
   return mAddNewTagsRes;
 }
 module.exports = {
+  sIsAddNewTags,
   sAddNewTags,
 };

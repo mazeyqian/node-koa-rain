@@ -316,7 +316,7 @@ async function sRobotRemindFeperf (ctx) {
  * @method sRobotRemindForConfirmTag
  * @desc 增加标签人工企业微信人工审核
  */
-async function sRobotRemindForConfirmTag ({ ctx, tags = [], tagList = [], contents = [], extra = {}, key = '', alias = '', repeat = true } = {}) {
+async function sRobotRemindForConfirmTag ({ ctx, user_id, game_id, tags = [], tagList = [], contents = [], extra = {}, key = '', alias = '', repeat = true } = {}) {
   // Repeat - begin
   if (repeat) {
     repeatSend(() => {
@@ -367,13 +367,15 @@ async function sRobotRemindForConfirmTag ({ ctx, tags = [], tagList = [], conten
       logContent += `||${name}|${value}`;
       // 如果是域名加路径，可以附加链接点击一下
       if (contents[0].name === 'host' && contents[1].name === 'url') {
-        link = `${contents[0].value}${contents[1].value}`;
+        console.log('user_id-----------------------------', user_id);
+        let tag_name = tagList.join(',');
+        link = `${contents[0].value}${contents[1].value}?user_id=${user_id}&game_id=${game_id}&tag_name=${tag_name}`;
       }
     }
     if (tagList.length) {
       let tagRet = ``;
       tagList.forEach(tag => {
-        tagRet += `\`${tag[0].tag_name}\` `;
+        tagRet += `\`${tag}\` `;
       });
       tagRet += '\n';
       const name = '标签';
@@ -392,7 +394,6 @@ async function sRobotRemindForConfirmTag ({ ctx, tags = [], tagList = [], conten
     sAddLog({ ctx, log_type: tags[0], content: logContent });
   }
   if (!isExist || (alias === 'TestUrl' && repeat === false)) {
-    console.log('没执行到这吧');
     if (link) {
       ret += `\nlink：[🔗通过](${link})<font color="comment">*（企业微信浏览器打开后，需要再次点击右上角↗系统默认浏览器）*</font>`;
       ret += `\nlink：[🔗驳回](${link})`;

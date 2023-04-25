@@ -29,11 +29,16 @@ const MazeyTag = sqlIns.define(
   }
 );
 // 查询所有游戏
-async function mAddNewTags ({ game_id, tag_name }) {
+async function mAddNewTags ({ user_id, game_id, tag_name }) {
   console.log('tag_name', tag_name);
   const tags = await Promise.all(
     tag_name.map(name => {
-      return MazeyTag.findOrCreate({ where: { tag_name: name } });
+      return MazeyTag.findOrCreate({
+        where: { tag_name: name },
+        defaults: {
+          user_id: user_id || 1,
+        },
+      });
     })
   );
   // const ret = await MazeyTag.bulkCreate(param, {

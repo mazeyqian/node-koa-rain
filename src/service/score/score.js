@@ -23,7 +23,6 @@ async function sAddNewScore (ctx, { game_id, score, start, remark }) {
   }
   const jwtToken = ctx.state.user;
   const queryGameRes = await queryUpdateGame({ game_id });
-  console.log('queryGameRes', queryGameRes);
   if (queryGameRes.data) {
     const addNewScoreRes = await addNewScore({
       game_id,
