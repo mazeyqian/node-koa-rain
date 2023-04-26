@@ -42,6 +42,17 @@ async function sQueryAllGame (ctx) {
 // 查询单个游戏
 async function sQueryGame (ctx, { game_id }) {
   console.log(ctx);
+  const schema = Joi.object({
+    game_id: Joi.string()
+      .required()
+      .error(new Error('请选择游戏')),
+  });
+  const { error } = schema.validate({
+    game_id,
+  });
+  if (error) {
+    return err({ message: error.message });
+  }
   const queryGameRes = await queryUpdateGame({ game_id });
   return queryGameRes;
 }

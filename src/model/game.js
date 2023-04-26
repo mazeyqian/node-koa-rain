@@ -85,7 +85,11 @@ async function queryUpdateGame ({ game_id }) {
     where: {
       game_id,
     },
-    include: [MazeyTag],
+    include: [
+      {
+        model: MazeyTag,
+      },
+    ],
   }).catch(console.error);
   if (!ret) {
     return err({ message: '该游戏不存在' });
