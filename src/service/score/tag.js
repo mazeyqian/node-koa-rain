@@ -1,43 +1,63 @@
 const { err } = require('../../entities/err');
 const { rsp } = require('../../entities/response');
-const { mAddNewTags } = require('../../model/tag');
+const { mAddNewTags, mQueryOldTags } = require('../../model/tag');
 const { mAddNewGameTags } = require('../../model/game');
 const { sRobotRemindForConfirmTag } = require('../../service/robot/robot');
 const Joi = require('joi');
 async function sIsAddNewTags (ctx, { user_id, user_name, game_id, tag_name }) {
   const jwtToken = ctx.state.user;
-  console.log('jwtToken', jwtToken);
-  let params = {
-    ctx,
-    key: '',
-    alias: 'pigKey',
-    tags: ['标签添加'],
-    tagList: tag_name,
-    user_id: user_id || (jwtToken && jwtToken.data ? jwtToken.data.user_id : ''),
-    user_name: user_name || (jwtToken && jwtToken.data ? jwtToken.data.user_name : ''),
-    game_id,
-    contents: [
-      {
-        name: 'host',
-        value: 'localhost:3224',
-      },
-      {
-        name: 'url',
-        value: '/server/tag/add',
-      },
-      {
-        name: 'env',
-        value: process.env.NODE_ENV,
-      },
-    ],
-  };
-  const robotRemindForConfirmTagRes = await sRobotRemindForConfirmTag({ ...params });
-  console.log('mAddNewTagsRes', robotRemindForConfirmTagRes);
-  return robotRemindForConfirmTagRes;
+  let id = user_id || (jwtToken && jwtToken.data ? jwtToken.data.user_id : '');
+  let name = user_name || (jwtToken && jwtToken.data ? jwtToken.data.user_name : '');
+  // 先进行已有标签插入,没有确认的标签进行确认
+  let mQueryOldTagsRes = await mQueryOldTags({ tag_name });
+  let oldTags = [];
+  let newTags = [];
+  tag_name.forEach(item => {
+    let index = mQueryOldTagsRes.data.findIndex(v => v.dataValues.tag_name === item);
+    if (index > -1) {
+      oldTags.push(item);
+    } else {
+      newTags.push(item);
+    }
+  });
+  if (oldTags.length > 0) {
+    let sAddNewTagsRes = await sAddNewTags(ctx, { user_id: id, user_name: name, game_id, tag_name });
+    if (newTags.length === 0) {
+      return sAddNewTagsRes;
+    }
+  }
+  console.log('oldTags', oldTags, 'newTags', newTags);
+  if (newTags.length > 0) {
+    let params = {
+      ctx,
+      key: '',
+      alias: 'pigKey',
+      tags: ['标签添加'],
+      tagList: newTags,
+      user_id: id,
+      user_name: name,
+      game_id,
+      contents: [
+        {
+          name: 'host',
+          value: 'localhost:3224',
+        },
+        {
+          name: 'url',
+          value: '/server/tag/add',
+        },
+        {
+          name: 'env',
+          value: process.env.NODE_ENV,
+        },
+      ],
+    };
+    const robotRemindForConfirmTagRes = await sRobotRemindForConfirmTag({ ...params });
+    return robotRemindForConfirmTagRes;
+  }
 }
 // 批量增加标签,主要判重
 async function sAddNewTags (ctx, { user_id, user_name, game_id, tag_name }) {
-  console.log('tag_name', typeof tag_name);
   const schema = Joi.object({
     game_id: Joi.number()
       .integer()
@@ -54,7 +74,6 @@ async function sAddNewTags (ctx, { user_id, user_name, game_id, tag_name }) {
     return err({ message: error.message });
   }
   const jwtToken = ctx.state.user;
-  console.log('user_id', user_id);
   const mAddNewTagsRes = await mAddNewTags({
     user_id: user_id || (jwtToken && jwtToken.data ? jwtToken.data.user_id : ''),
     user_name: user_name || (jwtToken && jwtToken.data ? jwtToken.data.user_name : ''),
