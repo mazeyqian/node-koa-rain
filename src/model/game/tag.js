@@ -15,6 +15,10 @@ const MazeyTag = sqlIns.define(
       type: DataTypes.STRING(200),
       unique: true,
     },
+    // 1 通过 2驳回 3待定
+    tag_status: {
+      type: DataTypes.INTEGER,
+    },
     tag_description: {
       type: DataTypes.STRING(200),
     },
@@ -33,12 +37,12 @@ const MazeyTag = sqlIns.define(
   }
 );
 // 增加标签
-async function mAddNewTags ({ user_id, user_name, tag_name }) {
+async function mAddNewTags ({ user_id, user_name, tag_name, tag_status }) {
   // 创建前先看标签是否存在
   const tags = await Promise.all(
     tag_name.map(name => {
       return MazeyTag.findOrCreate({
-        where: { tag_name: name },
+        where: { tag_name: name, tag_status },
         defaults: {
           user_name: user_name || '系统',
           user_id: user_id || 1,

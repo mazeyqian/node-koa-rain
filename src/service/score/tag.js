@@ -57,7 +57,7 @@ async function sIsAddNewTags (ctx, { user_id, user_name, game_id, tag_name }) {
   }
 }
 // 批量增加标签,主要判重
-async function sAddNewTags (ctx, { user_id, user_name, game_id, tag_name }) {
+async function sAddNewTags (ctx, { user_id, user_name, game_id, tag_name, tag_status = 1 }) {
   const schema = Joi.object({
     game_id: Joi.number()
       .integer()
@@ -79,6 +79,7 @@ async function sAddNewTags (ctx, { user_id, user_name, game_id, tag_name }) {
     user_name: user_name || (jwtToken && jwtToken.data ? jwtToken.data.user_name : ''),
     game_id,
     tag_name,
+    tag_status,
   });
   let tagData = mAddNewTagsRes.data;
   if (mAddNewTagsRes.data) {
