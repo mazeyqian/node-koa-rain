@@ -365,22 +365,27 @@ async function sRobotRemindForConfirmTag ({ ctx, user_id, user_name, game_id, ta
       const value = contents[2].value;
       ret += `${name}：<font color="info">${value}</font>\n`;
       logContent += `||${name}|${value}`;
+      if (tagList.length) {
+        let tagRet = ``;
+        tagList.forEach(tag => {
+          tagRet += `\`${tag}\` `;
+        });
+        tagRet += '\n';
+        const name = '标签';
+        ret += `${name}：<font color="comment">${tagRet}</font>`;
+        logContent += `||${name}|${tagRet}`;
+      }
       // 如果是域名加路径，可以附加链接点击一下
       if (contents[0].name === 'host' && contents[1].name === 'url') {
-        console.log('user_id-----------------------------', user_id);
         let tag_name = tagList.join(',');
+        if (tagList.length > 1) {
+          tagList.forEach(item => {
+            let linkStr = `${contents[0].value}${contents[1].value}?user_id=${user_id}&user_name=${user_name}&game_id=${game_id}&tag_name=${item}`;
+            ret += `\nlink：${item}[🔗通过](${linkStr})`;
+          });
+        }
         link = `${contents[0].value}${contents[1].value}?user_id=${user_id}&user_name=${user_name}&game_id=${game_id}&tag_name=${tag_name}`;
       }
-    }
-    if (tagList.length) {
-      let tagRet = ``;
-      tagList.forEach(tag => {
-        tagRet += `\`${tag}\` `;
-      });
-      tagRet += '\n';
-      const name = '标签';
-      ret += `${name}：<font color="comment">${tagRet}</font>`;
-      logContent += `||${name}|${tagRet}`;
     }
   }
   let IsExistContentRes = null;
@@ -395,7 +400,7 @@ async function sRobotRemindForConfirmTag ({ ctx, user_id, user_name, game_id, ta
   }
   if (!isExist || (alias === 'TestUrl' && repeat === false)) {
     if (link) {
-      ret += `\nlink：[🔗通过](${link})<font color="comment">*（企业微信浏览器打开后，需要再次点击右上角↗系统默认浏览器）*</font>`;
+      ret += `\nlink：[🔗全部通过](${link})`;
       ret += `\nlink：[🔗驳回](${link})`;
     }
     const res = await axios

@@ -32,9 +32,9 @@ const MazeyTag = sqlIns.define(
     indexes: [{ fields: ['tag_name'] }],
   }
 );
-// 查询所有游戏
-async function mAddNewTags ({ user_id, user_name, game_id, tag_name }) {
-  console.log('tag_name', tag_name);
+// 增加标签
+async function mAddNewTags ({ user_id, user_name, tag_name }) {
+  // 创建前先看标签是否存在
   const tags = await Promise.all(
     tag_name.map(name => {
       return MazeyTag.findOrCreate({
@@ -49,11 +49,20 @@ async function mAddNewTags ({ user_id, user_name, game_id, tag_name }) {
   // const ret = await MazeyTag.bulkCreate(param, {
   //   updateOnDuplicate: ['tag_name'],
   // });
-  console.log('tags', tags);
+  return rsp({ data: tags });
+}
+// 查询已有标签
+async function mQueryOldTags ({ tag_name }) {
+  let tags = await MazeyTag.findAll({
+    where: {
+      tag_name: tag_name,
+    },
+  });
   return rsp({ data: tags });
 }
 MazeyTag.sync();
 module.exports = {
   MazeyTag,
   mAddNewTags,
+  mQueryOldTags,
 };
