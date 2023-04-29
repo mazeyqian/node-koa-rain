@@ -1,7 +1,7 @@
-const { sqlIns } = require('../entities/orm');
+const { sqlIns } = require('../../entities/orm');
 const { DataTypes } = require('sequelize');
-const { rsp } = require('../entities/response');
-const { err } = require('../entities/error');
+const { rsp } = require('../../entities/response');
+const { err } = require('../../entities/error');
 const { MazeyTag } = require('./tag');
 const { MazeyGameTag } = require('./gameTag');
 const MazeyGame = sqlIns.define(

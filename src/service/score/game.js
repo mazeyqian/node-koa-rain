@@ -1,6 +1,6 @@
 const { err } = require('../../entities/err');
 const { rsp } = require('../../entities/response');
-const { addNewGame, queryAllGame, queryUpdateGame } = require('../../model/game');
+const { addNewGame, queryAllGame, queryUpdateGame } = require('../../model/game/game');
 const axios = require('axios');
 const Joi = require('joi');
 // 增加游戏

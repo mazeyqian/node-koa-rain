@@ -1,7 +1,7 @@
 const { err } = require('../../entities/err');
 const { rsp } = require('../../entities/response');
-const { mAddNewTags } = require('../../model/tag');
-const { mAddNewGameTags } = require('../../model/game');
+const { mAddNewTags } = require('../../model/game/tag');
+const { mAddNewGameTags } = require('../../model/game/game');
 const { sRobotRemindForConfirmTag } = require('../../service/robot/robot');
 const Joi = require('joi');
 async function sIsAddNewTags (ctx, { user_id, user_name, game_id, tag_name }) {
