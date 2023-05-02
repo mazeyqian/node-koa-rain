@@ -226,7 +226,8 @@ server
     ctx.body = await sAddNewGame(ctx, { ...obj });
   })
   .post('/game/get-list', async ctx => {
-    ctx.body = await sQueryAllGame(ctx);
+    const { currentPage, pageSize } = ctx.request.body;
+    ctx.body = await sQueryAllGame(ctx, { currentPage, pageSize });
   })
   .get('/game/query', async ctx => {
     ctx.body = await sQueryGame(ctx, { game_id: ctx.query.id });

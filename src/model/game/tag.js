@@ -39,11 +39,13 @@ const MazeyTag = sqlIns.define(
 // 增加标签
 async function mAddNewTags ({ user_id, user_name, tag_name, tag_status }) {
   // 创建前先看标签是否存在
+  console.log('tag_name', tag_name);
   const tags = await Promise.all(
     tag_name.map(name => {
       return MazeyTag.findOrCreate({
-        where: { tag_name: name, tag_status },
+        where: { tag_name: name },
         defaults: {
+          tag_status: tag_status,
           user_name: user_name || '系统',
           user_id: user_id || 1,
         },
@@ -53,7 +55,12 @@ async function mAddNewTags ({ user_id, user_name, tag_name, tag_status }) {
   // const ret = await MazeyTag.bulkCreate(param, {
   //   updateOnDuplicate: ['tag_name'],
   // });
-  return rsp({ data: tags });
+  console.log('tag_status', tag_status);
+  if (tag_status === 1 || tag_status === '1') {
+    return rsp({ data: tags });
+  } else {
+    return rsp({ data: [] });
+  }
 }
 // 查询已有标签
 async function mQueryOldTags ({ tag_name }) {
@@ -62,6 +69,7 @@ async function mQueryOldTags ({ tag_name }) {
       tag_name: tag_name,
     },
   });
+  console.log('已经有的标签', tags);
   return rsp({ data: tags });
 }
 MazeyTag.sync();

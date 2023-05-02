@@ -45,7 +45,6 @@ async function authMiddleware (ctx, next) {
 }
 function jwtVerify (token) {
   return jwt.verify(token, config.secret, function (err, jwtDecoded) {
-    console.log('token', err, jwtDecoded);
     if (err) {
       return {
         code: 1,

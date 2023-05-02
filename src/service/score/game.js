@@ -35,8 +35,8 @@ async function sAddNewGame (ctx, { game_name, game_english_name, game_type, game
   return addNewGameRes;
 }
 // 查询所有游戏
-async function sQueryAllGame (ctx) {
-  const queryAllGameRes = await queryAllGame();
+async function sQueryAllGame (ctx, { currentPage, pageSize }) {
+  const queryAllGameRes = await queryAllGame({ currentPage, pageSize });
   return queryAllGameRes;
 }
 // 查询单个游戏

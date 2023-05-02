@@ -366,7 +366,7 @@ async function sRobotRemindForConfirmTag ({ ctx, user_id, user_name, game_id, ta
       ret += `${name}：<font color="info">${value}</font>\n`;
       logContent += `||${name}|${value}`;
       if (tagList.length) {
-        let tagRet = ``;
+        let tagRet = `游戏${game_id}`;
         tagList.forEach(tag => {
           tagRet += `\`${tag}\` `;
         });
@@ -381,7 +381,7 @@ async function sRobotRemindForConfirmTag ({ ctx, user_id, user_name, game_id, ta
         if (tagList.length > 1) {
           tagList.forEach(item => {
             let linkStr = `${contents[0].value}${contents[1].value}?user_id=${user_id}&user_name=${user_name}&game_id=${game_id}&tag_name=${item}`;
-            ret += `\nlink：${item}[🔗通过](${linkStr}&tag_status=1) ([🔗驳回](${linkStr}&tag_status=1)`;
+            ret += `\nlink：${item}[🔗通过](${linkStr}&tag_status=1)  [🔗驳回](${linkStr}&tag_status=2)`;
           });
         }
         link = `${contents[0].value}${contents[1].value}?user_id=${user_id}&user_name=${user_name}&game_id=${game_id}&tag_name=${tag_name}`;
@@ -391,6 +391,7 @@ async function sRobotRemindForConfirmTag ({ ctx, user_id, user_name, game_id, ta
   let IsExistContentRes = null;
   let isExist = false;
   if (logContent) {
+    console.log('日志logContent', logContent);
     IsExistContentRes = await sIsExistContent({ content: logContent });
     ({
       data: { isExist },
@@ -401,7 +402,7 @@ async function sRobotRemindForConfirmTag ({ ctx, user_id, user_name, game_id, ta
   if (!isExist || (alias === 'TestUrl' && repeat === false)) {
     if (link) {
       ret += `\nlink：[🔗全部通过](${link}&tag_status=1)`;
-      ret += `\nlink：[🔗驳回](${link}&tag_status=2)`;
+      ret += `\nlink：[🔗全部驳回](${link}&tag_status=2)`;
     }
     const res = await axios
       .post(`${weComRobotUrl}?key=${realKey || alias2Key.get('rabbitKey')}`, {

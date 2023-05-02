@@ -1,6 +1,6 @@
 const { sqlIns } = require('../../entities/orm');
 const { DataTypes } = require('sequelize');
-const { rsp } = require('../../entities/response');
+const { rsp, rspPage } = require('../../entities/response');
 const { err } = require('../../entities/error');
 const { MazeyTag } = require('./tag');
 const { MazeyGameTag } = require('./gameTag');
@@ -121,11 +121,19 @@ async function mUpdateGame ({ data }, score) {
   }
   return rsp({ data: ret.dataValues });
 }
-// 查询所有游戏
-async function queryAllGame () {
-  const ret = await MazeyGame.findAll().catch(console.error);
+// 查询所有游戏进行分页
+async function queryAllGame ({ currentPage, pageSize }) {
+  const pageIndex = currentPage || 0;
+  const pageNo = pageSize || 10;
+  const offset = pageIndex * pageNo;
+  const total = await MazeyGame.count();
+  const ret = await MazeyGame.findAll({
+    limit: pageSize,
+    offset: offset,
+    order: [['create_at', 'DESC']],
+  }).catch(console.error);
   console.log('ret', ret);
-  return rsp({ data: ret });
+  return rspPage({ data: ret, currentPage, total });
 }
 // 给游戏增加标签
 async function mAddNewGameTags ({ game_id, data }) {

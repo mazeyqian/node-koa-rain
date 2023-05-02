@@ -21,7 +21,8 @@ async function sIsAddNewTags (ctx, { user_id, user_name, game_id, tag_name }) {
     }
   });
   if (oldTags.length > 0) {
-    let sAddNewTagsRes = await sAddNewTags(ctx, { user_id: id, user_name: name, game_id, tag_name });
+    let sAddNewTagsRes = await sAddNewTags(ctx, { user_id: id, user_name: name, game_id, tag_name: oldTags });
+    // 只需要给游戏增加标签即可
     if (newTags.length === 0) {
       return sAddNewTagsRes;
     }
@@ -82,6 +83,7 @@ async function sAddNewTags (ctx, { user_id, user_name, game_id, tag_name, tag_st
     tag_status,
   });
   let tagData = mAddNewTagsRes.data;
+  console.log('tagData', tagData, mAddNewTagsRes);
   if (mAddNewTagsRes.data) {
     const mAddNewGameTagsRes = await mAddNewGameTags({
       game_id,
