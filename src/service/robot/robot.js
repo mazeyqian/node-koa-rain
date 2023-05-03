@@ -312,7 +312,113 @@ async function sRobotRemindFeperf (ctx) {
   }
   return rsp({ message: '成功' });
 }
-
+/**
+ * @method sRobotRemindForConfirmTag
+ * @desc 增加标签人工企业微信人工审核
+ */
+async function sRobotRemindForConfirmTag ({ ctx, user_id, user_name, game_id, tags = [], tagList = [], contents = [], extra = {}, key = '', alias = '', repeat = true } = {}) {
+  // Repeat - begin
+  if (repeat) {
+    repeatSend(() => {
+      sRobotRemindForConfirmTag({ ctx, user_id, user_name, tags, tagList, contents, extra, key: '', alias: 'TestUrl', repeat: false });
+    });
+  }
+  // Repeat - end
+  let realKey;
+  if (alias) {
+    const sGetRobotKeyByAliasRes = sGetRobotKeyByAlias({ alias });
+    if (sGetRobotKeyByAliasRes.ret !== 0) {
+      return sGetRobotKeyByAliasRes;
+    }
+    ({
+      data: { key: realKey },
+    } = sGetRobotKeyByAliasRes);
+  }
+  if (!realKey && key) {
+    realKey = key;
+  }
+  let ret = '';
+  if (tags.length) {
+    tags.forEach(tag => {
+      ret += `\`#${tag}\` `;
+    });
+    ret += '\n';
+  }
+  // 日志内容
+  let logContent = '';
+  let link = '';
+  if (contents.length) {
+    if (contents[0]) {
+      const name = contents[0].name;
+      const value = contents[0].value;
+      ret += `${name}：<font color="comment">${value}</font>\n`;
+      logContent += `${name}|${value}`;
+    }
+    if (contents[1]) {
+      const name = contents[1].name;
+      const value = contents[1].value;
+      ret += `${name}：<font color="warning">${value}</font>\n`;
+      logContent += `||${name}|${value}`;
+    }
+    if (contents[2]) {
+      const name = contents[2].name;
+      const value = contents[2].value;
+      ret += `${name}：<font color="info">${value}</font>\n`;
+      logContent += `||${name}|${value}`;
+      if (tagList.length) {
+        let tagRet = `游戏${game_id}`;
+        tagList.forEach(tag => {
+          tagRet += `\`${tag}\` `;
+        });
+        tagRet += '\n';
+        const name = '标签';
+        ret += `${name}：<font color="comment">${tagRet}</font>`;
+        logContent += `||${name}|${tagRet}`;
+      }
+      // 如果是域名加路径，可以附加链接点击一下
+      if (contents[0].name === 'host' && contents[1].name === 'url') {
+        let tag_name = tagList.join(',');
+        if (tagList.length > 1) {
+          tagList.forEach(item => {
+            let linkStr = `${contents[0].value}${contents[1].value}?user_id=${user_id}&user_name=${user_name}&game_id=${game_id}&tag_name=${item}`;
+            ret += `\nlink：${item}[🔗通过](${linkStr}&tag_status=1)  [🔗驳回](${linkStr}&tag_status=2)`;
+          });
+        }
+        link = `${contents[0].value}${contents[1].value}?user_id=${user_id}&user_name=${user_name}&game_id=${game_id}&tag_name=${tag_name}`;
+      }
+    }
+  }
+  let IsExistContentRes = null;
+  let isExist = false;
+  if (logContent) {
+    console.log('日志logContent', logContent);
+    IsExistContentRes = await sIsExistContent({ content: logContent });
+    ({
+      data: { isExist },
+    } = IsExistContentRes);
+    console.log('logContent', logContent);
+    sAddLog({ ctx, log_type: tags[0], content: logContent });
+  }
+  if (!isExist || (alias === 'TestUrl' && repeat === false)) {
+    if (link) {
+      ret += `\nlink：[🔗全部通过](${link}&tag_status=1)`;
+      ret += `\nlink：[🔗全部驳回](${link}&tag_status=2)`;
+    }
+    const res = await axios
+      .post(`${weComRobotUrl}?key=${realKey || alias2Key.get('rabbitKey')}`, {
+        msgtype: 'markdown',
+        markdown: {
+          content: ret,
+        },
+      })
+      .catch(console.error);
+    if (!res) {
+      return err({ message: '接口错误' });
+    }
+    return rsp({ message: '成功' });
+  }
+  return err({ message: '日志已存在' });
+}
 /**
  * @method sRobotRemindForCommonTag
  * @desc 通用带标签的前端提醒 CICD
@@ -379,6 +485,7 @@ async function sRobotRemindForCommonTag ({ ctx, tags = [], contents = [], extra 
     ({
       data: { isExist },
     } = IsExistContentRes);
+    console.log('logContent', logContent);
     sAddLog({ ctx, log_type: tags[0], content: logContent });
   }
   if (!isExist || (alias === 'TestUrl' && repeat === false)) {
@@ -1076,4 +1183,5 @@ module.exports = {
   sRobotRemindForTouchFish02,
   sRobotRemindForFeishuStronger,
   sRobotFeishuGroup,
+  sRobotRemindForConfirmTag,
 };

@@ -4,13 +4,15 @@ const { rsp } = require('../entities/response');
 const { getUid, acquireNewUser, mLogin, mGenToken } = require('../model/user');
 const { acquireNewCode } = require('../model/code');
 const { sendMail } = require('./code');
-const { emailRegExp, nickRegTest } = require('../utils/utils');
+const { emailRegExp } = require('../utils/utils');
 const WeatherApi = require('./weather/weather');
 const { WeatherConf } = require('../config/index');
 const weatherIns = new WeatherApi(WeatherConf.UID, WeatherConf.KEY);
 const axios = require('axios');
 const { format } = require('date-fns');
 const md5 = require('md5');
+// 校验
+const Joi = require('joi');
 // 获取 uid
 async function sGetUid (ctx) {
   if (ctx.query.uid) return rsp({ data: { uid: Number(ctx.query.uid) } });
@@ -92,11 +94,32 @@ async function sGetUserInfo (ctx) {
 }
 
 async function sAddNewUser (ctx, nick_name, real_name = '', user_password = '', user_email = '') {
-  if (!nick_name) {
-    return err({ message: '缺少昵称' });
-  }
-  if (!nickRegTest(nick_name)) {
-    return err({ message: '昵称不符合规范,请重新输入' });
+  const schema = Joi.object({
+    nick_name: Joi.string()
+      .pattern(new RegExp(`^[a-zA-Z\u4e00-\u9fa5][a-zA-Z0-9\u4e00-\u9fa5]*$`))
+      .min(1)
+      .max(20)
+      .required()
+      .error(errors => {
+        for (let valErr of errors) {
+          console.log(valErr.code);
+          switch (valErr.code) {
+          case 'string.max':
+            return new Error('用户名长度不能超过20');
+          case 'string.empty':
+          case 'any.required':
+            return new Error('用户名必填');
+          default:
+            return new Error('用户名格式错误');
+          }
+        }
+      }),
+  });
+  const { error } = schema.validate({
+    nick_name: nick_name,
+  });
+  if (error) {
+    return err({ message: error.message });
   }
   if (user_email && !emailRegExp(user_email)) {
     return err({ message: '邮箱输入错误,请重新输入' });

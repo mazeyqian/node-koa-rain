@@ -14,9 +14,9 @@ function jwtCreate (data, time) {
   return token;
 }
 async function authMiddleware (ctx, next) {
-  // 暂时只加三个接口
+  // 暂时只加四个接口
   const token = ctx.headers.authorization;
-  let authorList = ['/server/game/add', '/server/score/add', '/server/upload'];
+  let authorList = ['/server/game/add', '/server/score/add', '/server/upload', '/server/tag/add'];
   if (!authorList.includes(ctx.request.url)) {
     await next();
     return;
@@ -45,7 +45,6 @@ async function authMiddleware (ctx, next) {
 }
 function jwtVerify (token) {
   return jwt.verify(token, config.secret, function (err, jwtDecoded) {
-    console.log('token', err, jwtDecoded);
     if (err) {
       return {
         code: 1,

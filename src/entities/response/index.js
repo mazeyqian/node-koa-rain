@@ -12,6 +12,21 @@ function rsp ({ ctx, ret = 0, info = 'ok', message = '成功', data = {} } = {})
   return rspBody;
 }
 
+// 格式化返回字段分页
+function rspPage ({ ctx, ret = 0, info = 'ok', message = '成功', data = {}, currentPage = 1, total = 0, pageSize = 10 } = {}) {
+  const rspBody = {
+    ret,
+    info,
+    message,
+    data,
+    currentPage,
+    total,
+    pageSize,
+  };
+  if (ctx) ctx.body = rspBody;
+  return rspBody;
+}
+
 // OSS 上传
 function ossRsp (a) {
   if (a.asset_id) {
@@ -32,5 +47,6 @@ function ossRsp (a) {
 
 module.exports = {
   rsp,
+  rspPage,
   ossRsp,
 };

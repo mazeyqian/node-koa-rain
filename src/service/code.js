@@ -4,12 +4,29 @@ const { updateCodeStatus, acquireNotExpireCode } = require('../model/code');
 const axios = require('axios');
 const nodemailer = require('nodemailer');
 const { $email_name, $email_key } = require('../config/env.development');
+const Joi = require('joi');
 // 校验邮箱
 async function sUpdateCodeStatus (ctx, user_email, code) {
+  const schema = Joi.object({
+    user_email: Joi.string()
+      .required()
+      .error(new Error('请输入邮箱')),
+    code: Joi.string()
+      .required()
+      .error(new Error('请输入验证码')),
+  });
+  const { error } = schema.validate({
+    user_email,
+    code,
+  });
+  if (error) {
+    return err({ message: error.message });
+  }
   const updateCodeStatusRes = await updateCodeStatus({
     user_email,
     code,
   });
+  console.log('updateCodeStatusRes', updateCodeStatusRes);
   if (updateCodeStatusRes.ret !== 0) {
     return updateCodeStatusRes;
   }

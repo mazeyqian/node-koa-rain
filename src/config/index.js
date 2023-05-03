@@ -4,7 +4,7 @@ const ENV = process.env.NODE_ENV;
 const envConfig = require(`./env.${ENV}`);
 
 Object.assign(envConfig, {
-  tinyBaseUrl: 'https://mazey.cn',
+  tinyBaseUrl: 'https://i.mazey.net',
   assetsBaseUrl: 'https://i.mazey.net',
 });
 

@@ -1,8 +1,9 @@
-const { sqlIns } = require('../entities/orm');
+const { sqlIns } = require('../../entities/orm');
 const { DataTypes } = require('sequelize');
-const { rsp } = require('../entities/response');
-const { err } = require('../entities/error');
-
+const { rsp, rspPage } = require('../../entities/response');
+const { err } = require('../../entities/error');
+const { MazeyTag } = require('./tag');
+const { MazeyGameTag } = require('./gameTag');
 const MazeyGame = sqlIns.define(
   'MazeyGame',
   {
@@ -84,6 +85,11 @@ async function queryUpdateGame ({ game_id }) {
     where: {
       game_id,
     },
+    include: [
+      {
+        model: MazeyTag,
+      },
+    ],
   }).catch(console.error);
   if (!ret) {
     return err({ message: '该游戏不存在' });
@@ -115,17 +121,41 @@ async function mUpdateGame ({ data }, score) {
   }
   return rsp({ data: ret.dataValues });
 }
-// 查询所有游戏
-async function queryAllGame () {
-  const ret = await MazeyGame.findAll().catch(console.error);
+// 查询所有游戏进行分页
+async function queryAllGame ({ currentPage, pageSize }) {
+  const pageIndex = currentPage || 0;
+  const pageNo = pageSize || 10;
+  const offset = pageIndex * pageNo;
+  const total = await MazeyGame.count();
+  const ret = await MazeyGame.findAll({
+    limit: pageSize,
+    offset: offset,
+    order: [['create_at', 'DESC']],
+  }).catch(console.error);
   console.log('ret', ret);
-  return rsp({ data: ret });
+  return rspPage({ data: ret, currentPage, total });
+}
+// 给游戏增加标签
+async function mAddNewGameTags ({ game_id, data }) {
+  const ret = await MazeyGame.findOne({
+    where: {
+      game_id,
+    },
+  }).catch(console.error);
+  if (!ret) {
+    return err({ message: '该游戏不存在' });
+  }
+  let tagIds = data.map(item => item[0].tag_id);
+  console.log('tagIds', tagIds);
+  ret.addMazeyTags(tagIds, { through: { unique: true } });
 }
 MazeyGame.sync();
-
+MazeyGame.belongsToMany(MazeyTag, { through: MazeyGameTag, foreignKey: 'game_id', otherKey: 'tag_id' });
+MazeyTag.belongsToMany(MazeyGame, { through: MazeyGameTag, foreignKey: 'tag_id', otherKey: 'game_id' });
 module.exports = {
   addNewGame,
   queryUpdateGame,
   queryAllGame,
   mUpdateGame,
+  mAddNewGameTags,
 };

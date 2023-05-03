@@ -70,6 +70,7 @@ async function queryOriLinkByKey (ctx, { tiny_key }) {
     ori_link = specialLink.get(tiny_key);
   } else {
     if (linkMap.has(tiny_key)) {
+      mUpdateTinyLink({ tiny_key });
       return rsp({
         data: {
           ori_link: linkMap.get(tiny_key),
@@ -78,6 +79,7 @@ async function queryOriLinkByKey (ctx, { tiny_key }) {
     } else {
       ({ ori_link = 'https://blog.mazey.net/tiny' } = (await queryTinyLink({ tiny_key })) || {});
       if (ori_link) {
+        mUpdateTinyLink({ tiny_key });
         ctx.linkMap.set(tiny_key, ori_link);
       }
     }

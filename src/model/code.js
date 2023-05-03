@@ -99,8 +99,9 @@ async function updateCodeStatus ({ user_email, code }) {
       [Op.and]: [{ user_email: user_email }, { code: code }, { verify_status: 0 }],
     },
   }).catch(console.error);
+  console.log('cRes', cRes);
   if (!cRes) {
-    return rsp({ message: '该邮箱已校验完成或未进行注册' });
+    return err({ message: '该邮箱已校验完成或未进行注册' });
   }
   console.log('cRes', cRes);
   // 判断code过期没
@@ -112,7 +113,7 @@ async function updateCodeStatus ({ user_email, code }) {
         verify_status: -1,
       })
       .catch(console.error);
-    return rsp({ message: '验证码已过期, 已重新发送验证码', data: { expire: true } });
+    return err({ message: '验证码已过期, 已重新发送验证码', data: { expire: true } });
   } else {
     const ret = await cRes
       .update({
@@ -133,7 +134,7 @@ async function mIsExistContent ({ user_email }) {
     return err();
   }
   if (cRes === 0) {
-    return rsp({ message: '不存在', data: { isExist: false } });
+    return err({ message: '不存在', data: { isExist: false } });
   }
   return rsp({ message: '该邮箱已绑定', data: { isExist: true } });
 }
