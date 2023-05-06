@@ -61,7 +61,6 @@ async function upload (ctx) {
     fileName = rs;
   }
   fileName = fileName.replace(/[\u4e00-\u9fa5]/g, a => {
-    console.log('a', a);
     return 'i';
   }); // 判断有汉字就进行unique
   let fileArray = fileName.split('.');
@@ -75,7 +74,7 @@ async function upload (ctx) {
   const status = new Promise(resolve => {
     ok = resolve;
   }, console.error);
-  let cdnDomain = process.env.NODE_ENV === 'development' ? 'http://localhost:8224/' : `${assetsBaseUrl}/`;
+  let cdnDomain = process.env.NODE_ENV === 'development' ? 'http://localhost:3224/' : `${assetsBaseUrl}/`;
   let ossResult = '';
   // 生成入库字段
   const assetLink = ''; // `https://mazey.cn/assets/${fileName}`;

@@ -63,22 +63,31 @@ const MazeyGame = sqlIns.define(
 );
 // 增加一个游戏
 async function addNewGame ({ game_picture, game_type, game_name, game_english_name, game_content, game_publisher = '', game_release_time = '', user_id, user_name }) {
-  const ret = await MazeyGame.create({
-    game_picture,
-    game_type,
-    game_name,
-    game_english_name,
-    game_content,
-    game_publisher,
-    game_release_time,
-    user_id,
-    user_name,
-  }).catch(console.error);
-  if (ret && ret.dataValues) {
-    return rsp({ data: ret.dataValues });
+  const amount = await MazeyGame.count({
+    where: {
+      game_name,
+    },
+  });
+  if (amount === 0) {
+    const ret = await MazeyGame.create({
+      game_picture,
+      game_type,
+      game_name,
+      game_english_name,
+      game_content,
+      game_publisher,
+      game_release_time,
+      user_id,
+      user_name,
+    }).catch(console.error);
+    if (ret && ret.dataValues) {
+      return rsp({ data: ret.dataValues });
+    }
+    return err();
   }
-  return err();
+  return rsp({ message: `${game_name}游戏已存在` });
 }
+// 导入游戏
 // 获取游戏信息并且更新
 async function queryUpdateGame ({ game_id }) {
   const ret = await MazeyGame.findOne({
@@ -131,6 +140,9 @@ async function queryAllGame ({ currentPage, pageSize }) {
     limit: pageSize,
     offset: offset,
     order: [['create_at', 'DESC']],
+    include: {
+      model: MazeyTag,
+    },
   }).catch(console.error);
   console.log('ret', ret);
   return rspPage({ data: ret, currentPage, total });
@@ -149,9 +161,9 @@ async function mAddNewGameTags ({ game_id, data }) {
   console.log('tagIds', tagIds);
   ret.addMazeyTags(tagIds, { through: { unique: true } });
 }
-MazeyGame.sync();
 MazeyGame.belongsToMany(MazeyTag, { through: MazeyGameTag, foreignKey: 'game_id', otherKey: 'tag_id' });
 MazeyTag.belongsToMany(MazeyGame, { through: MazeyGameTag, foreignKey: 'tag_id', otherKey: 'game_id' });
+MazeyGame.sync();
 module.exports = {
   addNewGame,
   queryUpdateGame,

@@ -483,7 +483,6 @@ async function sRobotRemindForCommonTag ({ ctx, tags = [], contents = [], extra 
     ({
       data: { isExist },
     } = IsExistContentRes);
-    console.log('logContent', logContent);
     sAddLog({ ctx, log_type: tags[0], content: logContent });
   }
   if (!isExist || (alias === 'TestUrl' && repeat === false)) {

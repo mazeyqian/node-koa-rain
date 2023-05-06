@@ -2,7 +2,7 @@ const { err } = require('../../entities/err');
 const { rsp } = require('../../entities/response');
 const { mAddNewTags, mQueryOldTags } = require('../../model/game/tag');
 const { mAddNewGameTags } = require('../../model/game/game');
-const { sRobotRemindForConfirmTag } = require('../../service/robot/robot');
+const { sRobotRemindForConfirmTag } = require('../robot/robot');
 const Joi = require('joi');
 const { url } = require('koa-router');
 async function sIsAddNewTags (ctx, { user_id, user_name, game_id, tag_name }) {
