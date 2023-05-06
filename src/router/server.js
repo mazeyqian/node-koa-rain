@@ -29,13 +29,13 @@ const { WeatherConf } = require('./../config/index');
 const { sGetRobotKeyByAlias } = require('../service/robot');
 const { sGetWeatherDaily } = require('../service/weather');
 const { sGetToken, sGetTicket } = require('../service/weixin');
-const { sAddNewGame, sQueryAllGame, sQueryGame } = require('../service/score/game');
-const { sAddNewScore, sQueryAllScore } = require('../service/score/score');
-const { sAddNewTags, sIsAddNewTags } = require('../service/score/tag');
+const { sAddNewGame, sQueryAllGame, sQueryGame } = require('../service/game/game');
+const { sAddNewScore, sQueryAllScore } = require('../service/game/score');
+const { sAddNewTags, sIsAddNewTags } = require('../service/game/tag');
 const weatherIns = new WeatherApi(WeatherConf.UID, WeatherConf.KEY);
 // 校验
 server
-  // Ping
+  // Ping (非登录接口)
   .get('/ping', async ctx => {
     ctx.body = 'ok';
   })
@@ -135,7 +135,7 @@ server
   .get('/query-visitors', async ctx => {
     ctx.body = await getLatestVisitors();
   })
-  // Upload
+  // Upload (需登录接口)
   .post('/upload', async ctx => {
     ctx.body = await upload(ctx);
   })

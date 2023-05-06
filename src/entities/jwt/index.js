@@ -23,7 +23,7 @@ async function authMiddleware (ctx, next) {
   }
   if (!token) {
     ctx.body = err({
-      message: '用户登陆过期,请重新登陆1',
+      message: '用户登陆过期,请重新登陆',
     });
     return;
   }
@@ -32,7 +32,7 @@ async function authMiddleware (ctx, next) {
     console.log('decoded', decoded);
     if (decoded.code !== 2) {
       ctx.body = err({
-        message: '用户登陆过期,请重新登陆2',
+        message: '用户登陆过期,请重新登陆',
       });
       return;
     }
