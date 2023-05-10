@@ -14,10 +14,11 @@ function jwtCreate (data, time) {
   return token;
 }
 async function authMiddleware (ctx, next) {
-  // 暂时只加四个接口
+  // 暂时只加五个接口
   const token = ctx.headers.authorization;
-  let authorList = ['/server/game/add', '/server/score/add', '/server/upload', '/server/tag/add'];
-  if (!authorList.includes(ctx.request.url)) {
+  let authorList = ['/server/upload/query', '/server/game/add', '/server/score/add', '/server/upload', '/server/tag/add'];
+  let requestUrl = ctx.request.url ? ctx.request.url.split('?')[0] : '';
+  if (!authorList.includes(requestUrl)) {
     await next();
     return;
   }

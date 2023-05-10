@@ -140,8 +140,7 @@ server
     ctx.body = await upload(ctx);
   })
   .get('/upload/query', async ctx => {
-    const { token } = ctx.query;
-    ctx.body = await getAssets({ ctx, token, asset_operator_id: Number(ctx.query.uid) });
+    ctx.body = await getAssets({ ctx, asset_operator_id: Number(ctx.query.uid) });
   })
   .post('/upload/remove', async ctx => {
     ctx.body = await sRemoveAsset(ctx);
@@ -244,7 +243,7 @@ server
     const { game_id, tag_name } = ctx.request.body;
     ctx.body = await sIsAddNewTags(ctx, { game_id, tag_name });
   })
-  .get('/tag/add', async ctx => {
+  .get('/tag/save', async ctx => {
     const { user_id, user_name, game_id, tag_name, tag_status } = ctx.query;
     ctx.body = await sAddNewTags(ctx, { user_id, user_name, game_id, tag_name, tag_status });
   });
