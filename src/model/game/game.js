@@ -97,8 +97,10 @@ async function queryUpdateGame ({ game_id }) {
     include: [
       {
         model: MazeyTag,
+        attributes: ['tag_id', 'tag_name'],
       },
     ],
+    through: { attributes: [] },
   }).catch(console.error);
   if (!ret) {
     return err({ message: '该游戏不存在' });
