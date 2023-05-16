@@ -4,6 +4,7 @@ const { rsp, rspPage } = require('../../entities/response');
 const { err } = require('../../entities/error');
 const { MazeyTag } = require('./tag');
 const { MazeyGameTag } = require('./gameTag');
+const { MazeySisDic } = require('./sisDic');
 const MazeyGame = sqlIns.define(
   'MazeyGame',
   {
@@ -99,6 +100,10 @@ async function queryUpdateGame ({ game_id }) {
         model: MazeyTag,
         attributes: ['tag_id', 'tag_name'],
       },
+      {
+        model: MazeySisDic,
+        attributes: ['dic_name'],
+      },
     ],
     through: { attributes: [] },
   }).catch(console.error);
@@ -142,9 +147,15 @@ async function queryAllGame ({ currentPage, pageSize }) {
     limit: pageSize,
     offset: offset,
     order: [['create_at', 'DESC']],
-    include: {
-      model: MazeyTag,
-    },
+    include: [
+      {
+        model: MazeyTag,
+      },
+      {
+        model: MazeySisDic,
+        attributes: ['dic_name'],
+      },
+    ],
   }).catch(console.error);
   console.log('ret', ret);
   return rspPage({ data: ret, currentPage, total });
@@ -165,6 +176,7 @@ async function mAddNewGameTags ({ game_id, data }) {
 }
 MazeyGame.belongsToMany(MazeyTag, { through: MazeyGameTag, foreignKey: 'game_id', otherKey: 'tag_id' });
 MazeyTag.belongsToMany(MazeyGame, { through: MazeyGameTag, foreignKey: 'tag_id', otherKey: 'game_id' });
+MazeyGame.belongsTo(MazeySisDic, { foreignKey: 'game_type' });
 MazeyGame.sync();
 module.exports = {
   addNewGame,
