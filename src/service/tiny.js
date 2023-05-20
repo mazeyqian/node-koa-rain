@@ -45,7 +45,7 @@ async function queryShortLink (ctx, { tiny_key }) {
   }
   const queryTinyLinkResut = await queryTinyLink({ tiny_key });
   if (queryTinyLinkResut) {
-    ctx.linkMap.set(tiny_key, queryTinyLinkResut.ori_link);
+    linkMap.set(tiny_key, queryTinyLinkResut.ori_link);
     mUpdateTinyLink({ tiny_key });
   }
   return rsp({
@@ -80,7 +80,7 @@ async function queryOriLinkByKey (ctx, { tiny_key }) {
       ({ ori_link = 'https://blog.mazey.net/tiny' } = (await queryTinyLink({ tiny_key })) || {});
       if (ori_link) {
         mUpdateTinyLink({ tiny_key });
-        ctx.linkMap.set(tiny_key, ori_link);
+        linkMap.set(tiny_key, ori_link);
       }
     }
   }
