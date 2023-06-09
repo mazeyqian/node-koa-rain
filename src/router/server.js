@@ -32,6 +32,7 @@ const { sGetToken, sGetTicket } = require('../service/weixin');
 const { sAddNewGame, sQueryAllGame, sQueryGame } = require('../service/game/game');
 const { sAddNewScore, sQueryAllScore } = require('../service/game/score');
 const { sAddNewTags, sIsAddNewTags } = require('../service/game/tag');
+const { sGetChatInfo } = require('../service/chat');
 const weatherIns = new WeatherApi(WeatherConf.UID, WeatherConf.KEY);
 // 校验
 server
@@ -246,6 +247,11 @@ server
   .get('/tag/save', async ctx => {
     const { user_id, user_name, game_id, tag_name, tag_status } = ctx.query;
     ctx.body = await sAddNewTags(ctx, { user_id, user_name, game_id, tag_name, tag_status });
+  })
+  // 测试gpt
+  .post('/chat', async ctx => {
+    const { messages } = ctx.request.body;
+    ctx.body = await sGetChatInfo(ctx, { messages });
   });
 
 module.exports = server;
