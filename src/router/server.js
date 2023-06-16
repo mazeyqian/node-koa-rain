@@ -84,6 +84,10 @@ server
     const { log_type, content } = ctx.request.body;
     ctx.body = await sAddLog({ ctx, log_type, content });
   })
+  .post('/log/bsixtyfour', async ctx => {
+    const { log_type, content } = ctx.request.body;
+    ctx.body = await sAddLog({ ctx, log_type, content, isEncode: true });
+  })
   .post('/log/report-error-info', async ctx => {
     const { logType, err, pageTitle, url, alias } = ctx.request.body;
     ctx.body = await sReportErrorInfo({ ctx, logType, err, pageTitle, url, alias });
