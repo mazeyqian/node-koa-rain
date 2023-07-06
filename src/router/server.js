@@ -1,6 +1,6 @@
 const { getCityInfo } = require('./../service/ip');
 const { getLatestVisitors, sAgentGet, sAgentPut, sAgentAny, sShowRequestInfo } = require('./../service/visitor');
-const { upload, getAssets, sGetOSSConfs, sNewOSSConf, sRemoveAsset, sNewGetOSSConfs, sAddOSSConf } = require('./../service/upload');
+const { upload, getAssets, sGetOSSConfs, sNewOSSConf, sRemoveAsset, sNewGetOSSConfs, sAddOSSConf, sSynthesize } = require('./../service/upload');
 const { report } = require('./../model/report');
 const { sGetUserInfo, sLogin, sGenToken, sAddNewUser } = require('./../service/user');
 const { sUpdateCodeStatus } = require('./../service/code');
@@ -256,6 +256,10 @@ server
   .post('/chat', async ctx => {
     const { messages } = ctx.request.body;
     ctx.body = await sGetChatInfo(ctx, { messages });
+  })
+  .post('/synthesize', async ctx => {
+    const { content } = ctx.request.body;
+    ctx.body = await sSynthesize(ctx, { content });
   });
 
 module.exports = server;

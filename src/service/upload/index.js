@@ -11,6 +11,8 @@ const { isNumber } = require('mazey');
 const { format } = require('date-fns');
 const mkdir = require('../../utils/mkdir');
 const { assetsBaseUrl } = require('../../config/index');
+const GTTS = require('gtts');
+const say = require('say');
 // 上传单个文件
 async function upload (ctx) {
   // 对token进行解码
@@ -34,7 +36,7 @@ async function upload (ctx) {
   await mkdir.mkdirs(fileUrl, err => {
     console.log('err', err); // 错误的话，直接打印如果地址跟
   });
-  const target = ctx.query.target || 'assets'; // 上传目录，默认 asset 生产https://i.mazey.net/assets/aaa.jpg  生产和开发区分/web/i.mazey.net/assets/aaa.jpg
+  const target = ctx.query.target || 'assets'; // 上传目录，默认 asset 生产ss://i.mazey.net/assets/aaa.jpg  生产和开发区分/web/i.mazey.net/assets/aaa.jpg
   let uid = Number(ctx.query.uid) || 0;
   // 通过指纹拿到 uid
   if (!uid) {
@@ -74,10 +76,10 @@ async function upload (ctx) {
   const status = new Promise(resolve => {
     ok = resolve;
   }, console.error);
-  let cdnDomain = process.env.NODE_ENV === 'development' ? 'http://localhost:3224/' : `${assetsBaseUrl}/`;
+  let cdnDomain = process.env.NODE_ENV === 'development' ? 's://localhost:3224/' : `${assetsBaseUrl}/`;
   let ossResult = '';
   // 生成入库字段
-  const assetLink = ''; // `https://mazey.cn/assets/${fileName}`;
+  const assetLink = ''; // `ss://mazey.cn/assets/${fileName}`;
   const showLink = `${cdnDomain}${target}/${lastFileStr}/${fileName}`;
   // 入库
   await newAsset({
@@ -198,6 +200,37 @@ async function sAddOSSConf ({ ossName, region, accessKeyId, accessKeySecret, buc
   }
   return err({ info: 'err_save_oss_conf' });
 }
+async function sSynthesize (ctx, { content }) {
+  const radioFolderPath = '../../../../video/';
+  const fileName = `${format(Date.now(), 'yyyyMMdd') + '-' + Math.round(Math.random() * 1e9)}.mp3`;
+  const filePath = path.join(__dirname, radioFolderPath) + `${fileName}`;
+  say.export(content, null, 1, filePath, error => {
+    if (error) {
+      console.error(`Failed to save audio: ${error}`);
+      return err({ info: error });
+    } else {
+      console.log(`Audio saved: ${filePath}`);
+      return rsp({ data: filePath });
+    }
+  });
+  return rsp();
+}
+async function sSynthesize2 (ctx, { content }) {
+  // 公司电脑连接不上
+  const radioFolderPath = '../../../../radio/';
+  const fileName = `${Date.now()}.mp3`;
+  const filePath = path.join(__dirname, radioFolderPath) + `${fileName}`;
+  const speech = new GTTS(content, 'zh');
+  console.log('执行了嘛', speech);
+  speech.save(filePath, error => {
+    if (error) {
+      return err({ info: error.message });
+    } else {
+      console.log('Audio saved successfully!');
+      return rsp({ data: fileName });
+    }
+  });
+}
 
 module.exports = {
   upload,
@@ -207,4 +240,6 @@ module.exports = {
   sRemoveAsset,
   sNewGetOSSConfs,
   sAddOSSConf,
+  sSynthesize,
+  sSynthesize2,
 };
