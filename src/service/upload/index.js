@@ -12,13 +12,14 @@ const { format } = require('date-fns');
 const mkdir = require('../../utils/mkdir');
 const { assetsBaseUrl } = require('../../config/index');
 const GTTS = require('gtts');
-const say = require('say');
+const say = require('../../utils/say');
 // 上传单个文件
 async function upload (ctx) {
   // 对token进行解码
   console.log('ctx', ctx.state.user);
   const jwtToken = ctx.state.user;
   const file = ctx.request.files.file; // 获取上传文件
+  const afferentTarget = ctx.request.target;
   if (!file.type) {
     return rsp({
       message: '请上传图片',
@@ -32,11 +33,11 @@ async function upload (ctx) {
     typeStr = typeStr[typeStr.length - 1];
   }
   let lastFileStr = fileStr[0] + '/' + typeStr;
-  let fileUrl = 'assets/' + lastFileStr;
+  let fileUrl = afferentTarget ? `${afferentTarget}` : `assets/${lastFileStr}`;
   await mkdir.mkdirs(fileUrl, err => {
     console.log('err', err); // 错误的话，直接打印如果地址跟
   });
-  const target = ctx.query.target || 'assets'; // 上传目录，默认 asset 生产ss://i.mazey.net/assets/aaa.jpg  生产和开发区分/web/i.mazey.net/assets/aaa.jpg
+  const target = afferentTarget || 'assets'; // 上传目录，默认 asset 生产ss://i.mazey.net/assets/aaa.jpg  生产和开发区分/web/i.mazey.net/assets/aaa.jpg
   let uid = Number(ctx.query.uid) || 0;
   // 通过指纹拿到 uid
   if (!uid) {
@@ -67,7 +68,7 @@ async function upload (ctx) {
   }); // 判断有汉字就进行unique
   let fileArray = fileName.split('.');
   fileName = fileArray[0] + '-' + format(Date.now(), 'yyyyMMdd') + '-' + Math.round(Math.random() * 1e9) + '.' + fileArray[fileArray.length - 1];
-  let downloadFileUrl = `../../../../assets/${lastFileStr}/`;
+  let downloadFileUrl = afferentTarget ? `../../../../${afferentTarget}` : `../../../../assets/${lastFileStr}/`;
   const filePath = path.join(__dirname, downloadFileUrl) + `${fileName}`;
   // 创建可写流
   const upStream = fs.createWriteStream(filePath);
@@ -76,7 +77,7 @@ async function upload (ctx) {
   const status = new Promise(resolve => {
     ok = resolve;
   }, console.error);
-  let cdnDomain = process.env.NODE_ENV === 'development' ? 's://localhost:3224/' : `${assetsBaseUrl}/`;
+  let cdnDomain = process.env.NODE_ENV === 'development' ? 'https://localhost:3224/' : `${assetsBaseUrl}/`;
   let ossResult = '';
   // 生成入库字段
   const assetLink = ''; // `ss://mazey.cn/assets/${fileName}`;
@@ -204,16 +205,16 @@ async function sSynthesize (ctx, { content }) {
   const radioFolderPath = '../../../../video/';
   const fileName = `${format(Date.now(), 'yyyyMMdd') + '-' + Math.round(Math.random() * 1e9)}.mp3`;
   const filePath = path.join(__dirname, radioFolderPath) + `${fileName}`;
-  say.export(content, null, 1, filePath, error => {
-    if (error) {
-      console.error(`Failed to save audio: ${error}`);
-      return err({ info: error });
-    } else {
-      console.log(`Audio saved: ${filePath}`);
-      return rsp({ data: filePath });
-    }
-  });
-  return rsp();
+  let cdnDomain = process.env.NODE_ENV === 'development' ? 'https://localhost:3224/' : `${assetsBaseUrl}/`;
+  const target = ctx.query.target || 'video';
+  const showLink = `${cdnDomain}${target}/${fileName}`;
+  // say.setEngine('say-mp3', 'com.apple.speech.synthesis.voice.ting-ting');
+  try {
+    await say.export(content, 'Microsoft Huihui Desktop', 1, filePath);
+    return rsp({ data: showLink });
+  } catch (error) {
+    return err({ info: error });
+  }
 }
 async function sSynthesize2 (ctx, { content }) {
   // 公司电脑连接不上
@@ -221,8 +222,7 @@ async function sSynthesize2 (ctx, { content }) {
   const fileName = `${Date.now()}.mp3`;
   const filePath = path.join(__dirname, radioFolderPath) + `${fileName}`;
   const speech = new GTTS(content, 'zh');
-  console.log('执行了嘛', speech);
-  speech.save(filePath, error => {
+  const res = speech.save(filePath, error => {
     if (error) {
       return err({ info: error.message });
     } else {
