@@ -33,6 +33,7 @@ const { sAddNewGame, sQueryAllGame, sQueryGame } = require('../service/game/game
 const { sAddNewScore, sQueryAllScore } = require('../service/game/score');
 const { sAddNewTags, sIsAddNewTags } = require('../service/game/tag');
 const { sGetChatInfo } = require('../service/chat');
+const { sUploadCard } = require('../service/card/card');
 const weatherIns = new WeatherApi(WeatherConf.UID, WeatherConf.KEY);
 // 校验
 server
@@ -257,9 +258,14 @@ server
     const { messages } = ctx.request.body;
     ctx.body = await sGetChatInfo(ctx, { messages });
   })
+  // 文字转语音
   .post('/synthesize', async ctx => {
     const { content } = ctx.request.body;
     ctx.body = await sSynthesize(ctx, { content });
+  })
+  // 提货卡
+  .post('/synthesize', async ctx => {
+    ctx.body = await sUploadCard(ctx);
   });
 
 module.exports = server;
