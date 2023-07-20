@@ -313,6 +313,26 @@ async function sRobotRemindFeperf (ctx) {
   return rsp({ message: '成功' });
 }
 /**
+ * @method sRobotRemindCardAddress
+ * @des 发送地址新增或者改变消息(包含卡号)
+ */
+async function sRobotRemindCardAddress ({ card_number, address_detail, address_user, address_mobile, address_date, address_number }) {
+  let content = `卡号: ${card_number}\n收货人: ${address_user}\n收货人手机号: ${address_mobile}\n详细地址: ${address_detail}\n发货日期: ${address_date}\n快递单号: ${address_number}`;
+  const res = await sCommonRobotSend({
+    alias: 'rabbitKey',
+    type: 'markdown',
+    data: {
+      content,
+    },
+    immediately: true,
+  }).catch(console.error);
+  if (!res) {
+    return err({ message: '接口错误' });
+  }
+  return rsp({ message: '成功' });
+}
+
+/**
  * @method sRobotRemindForConfirmTag
  * @desc 增加标签人工企业微信人工审核
  */
@@ -1181,4 +1201,5 @@ module.exports = {
   sRobotRemindForFeishuStronger,
   sRobotFeishuGroup,
   sRobotRemindForConfirmTag,
+  sRobotRemindCardAddress,
 };

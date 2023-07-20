@@ -34,9 +34,13 @@ const MazeyAddress = sqlIns.define(
       type: DataTypes.STRING(50),
     },
     address_number: {
+      // 快递单号
       type: DataTypes.STRING(50),
     },
     address_category: {
+      type: DataTypes.STRING(50),
+    },
+    address_date: {
       type: DataTypes.STRING(50),
     },
   },
@@ -46,18 +50,60 @@ const MazeyAddress = sqlIns.define(
     updatedAt: 'update_at',
   }
 );
-async function mAddAddressByNumber ({ card_number, address_detail, address_user, address_mobile }) {
+async function mAddAddressByNumber ({ card_number, address_detail, address_user, address_mobile, address_date }) {
   const ret = await MazeyAddress.create({
     address_detail,
     address_user,
     address_mobile,
+    address_date,
   }).catch(console.error);
   if (ret && ret.dataValues) {
     return rsp({ data: ret.dataValues });
   }
   return err();
 }
+// 修改地址或者填写单号
+async function mUpdateAddress ({ address_id, address_detail, address_user, address_mobile, address_date, address_number }) {
+  let ret = '';
+  if (address_number) {
+    ret = await MazeyAddress.update(
+      {
+        address_number,
+      },
+      {
+        where: {
+          address_id,
+        },
+      }
+    ).catch(console.error);
+    if (!ret) {
+      return err({ message: '该卡号不存在' });
+    }
+    return rsp({ data: ret.dataValues });
+  } else {
+    const ret = await MazeyAddress.update(
+      {
+        address_detail,
+        address_user,
+        address_mobile,
+        address_date,
+      },
+      {
+        where: {
+          address_id,
+        },
+      }
+    ).catch(console.error);
+    if (ret && ret.dataValues) {
+      return rsp({ data: ret.dataValues });
+    }
+    return err();
+  }
+}
+
 MazeyAddress.sync();
 module.exports = {
+  MazeyAddress,
   mAddAddressByNumber,
+  mUpdateAddress,
 };

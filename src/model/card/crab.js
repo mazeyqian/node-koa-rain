@@ -29,4 +29,6 @@ const MazeyCrab = sqlIns.define(
   }
 );
 MazeyCrab.sync();
-module.exports = {};
+module.exports = {
+  MazeyCrab,
+};

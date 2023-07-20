@@ -3,6 +3,8 @@ const { sqlIns } = require('../../entities/orm');
 const { DataTypes } = require('sequelize');
 const { rsp, rspPage } = require('../../entities/response');
 const { err } = require('../../entities/error');
+const { MazeyCrab } = require('./crab');
+const { MazeyAddress } = require('./address');
 const MazeyCard = sqlIns.define(
   'MazeyCard',
   {
@@ -42,13 +44,32 @@ const MazeyCard = sqlIns.define(
     updatedAt: 'update_at',
   }
 );
-async function mGetCardByNumber ({ card_number, card_password }) {
+async function mCheckCardByNumber ({ card_number, card_password }) {
   const ret = await MazeyCard.findOne({
     where: {
       card_number,
-      card_password: card_password || '',
+      card_password: card_password,
     },
-    include: [],
+    through: { attributes: [] },
+  }).catch(console.error);
+  if (!ret) {
+    return err({ message: '该卡号不存在或者密码错误' });
+  }
+  return rsp({ data: ret.dataValues });
+}
+async function mGetCardByNumber ({ card_number }) {
+  const ret = await MazeyCard.findOne({
+    where: {
+      card_number,
+    },
+    include: [
+      {
+        model: MazeyAddress,
+      },
+      {
+        model: MazeyCrab,
+      },
+    ],
     through: { attributes: [] },
   }).catch(console.error);
   if (!ret) {
@@ -72,8 +93,29 @@ async function mUpdateCard ({ address_id, card_number }) {
   }
   return rsp({ data: ret.dataValues });
 }
+async function mUpdateCardByAddress ({ address_id }) {
+  const ret = await MazeyCard.update(
+    {
+      card_type: 2,
+    },
+    {
+      where: {
+        address_id,
+      },
+    }
+  ).catch(console.error);
+  if (!ret) {
+    return err({ message: '该卡号不存在' });
+  }
+  return rsp({ data: ret.dataValues });
+}
+// 两个外键
+MazeyCard.belongsTo(MazeyCrab, { foreignKey: 'crab_id' });
+MazeyCard.belongsTo(MazeyAddress, { foreignKey: 'address_id' });
 MazeyCard.sync();
 module.exports = {
+  mCheckCardByNumber,
   mGetCardByNumber,
   mUpdateCard,
+  mUpdateCardByAddress,
 };

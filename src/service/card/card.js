@@ -2,8 +2,9 @@ const fs = require('fs');
 const path = require('path');
 const { rsp, err } = require('../../entities/response');
 const ExcelJS = require('exceljs');
-const { mGetCardByNumber, mUpdateCard } = require('../../model/card/card');
-const { mAddAddressByNumber } = require('../../model/card/address');
+const { mGetCardByNumber, mUpdateCard, mUpdateCardByAddress, mCheckCardByNumber } = require('../../model/card/card');
+const { mAddAddressByNumber, mUpdateAddress } = require('../../model/card/address');
+const { sRobotRemindCardAddress } = require('../robot/robot');
 const Joi = require('joi');
 async function sUploadCard (ctx) {
   const file = ctx.request.files.file; // 获取上传文件
@@ -21,7 +22,7 @@ async function sUploadCard (ctx) {
     // 获取每一行的单元格数据
     const rowData = [];
     row.eachCell((cell, colNumber) => {
-      rowData.push(cell.value);
+      rowData.push(cell);
     });
     // 将每一行的数据存储到数组中
     data.push(rowData);
@@ -59,10 +60,10 @@ async function sGetCrabByNumber ({ card_number }) {
   if (error) {
     return err({ message: error.message });
   }
-  const mGetCrabByNumberRes = await mGetCardByNumber({ card_number });
+  const mGetCrabByNumberRes = await mCheckCardByNumber({ card_number });
   return mGetCrabByNumberRes;
 }
-async function sAddAddressByNumber ({ card_number, address_detail, address_user, address_mobile }) {
+async function sAddAddressByNumber ({ card_number, address_detail, address_user, address_mobile, address_date }) {
   const schema = Joi.object({
     card_number: Joi.string()
       .required()
@@ -76,6 +77,9 @@ async function sAddAddressByNumber ({ card_number, address_detail, address_user,
     address_mobile: Joi.string()
       .required()
       .error(new Error('请输入收货人手机号')),
+    address_date: Joi.string()
+      .required()
+      .error(new Error('请选择发货日期')),
   });
   const { error } = schema.validate({
     card_number,
@@ -88,17 +92,26 @@ async function sAddAddressByNumber ({ card_number, address_detail, address_user,
     if (mGetCrabByNumberRes.address_id) {
       return err({ message: '该卡已使用' });
     }
-    const mAddAddressByNumberRes = await mAddAddressByNumber({ card_number, address_detail, address_user, address_mobile });
+    const mAddAddressByNumberRes = await mAddAddressByNumber({ card_number, address_detail, address_user, address_mobile, address_date });
     if (mAddAddressByNumberRes) {
       const mUpdateCardRes = await mUpdateCard({ card_number, address_id: mAddAddressByNumberRes.data.address_id });
+      await sRobotRemindCardAddress({ card_number, address_detail, address_user, address_mobile, address_date });
       return mUpdateCardRes;
     }
   }
   return err({ message: '失败' });
 }
+async function sUpdateCardByAddressNumber ({ address_id, address_number }) {
+  // 填入单号的同时修改卡为已使用
+  await mUpdateAddress({ address_id, address_number });
+  const sUpdateCardByAddressRes = await mUpdateCardByAddress({ address_id });
+  return sUpdateCardByAddressRes;
+}
+
 module.exports = {
   sUploadCard,
   sGetCardByNumber,
   sGetCrabByNumber,
   sAddAddressByNumber,
+  sUpdateCardByAddressNumber,
 };
