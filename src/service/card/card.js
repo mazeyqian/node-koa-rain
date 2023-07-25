@@ -45,7 +45,7 @@ async function sGetCardByNumber ({ card_number, card_password }) {
   if (error) {
     return err({ message: error.message });
   }
-  const mGetCardByNumberRes = await mGetCardByNumber({ card_number, card_password });
+  const mGetCardByNumberRes = await mCheckCardByNumber({ card_number, card_password });
   return mGetCardByNumberRes;
 }
 async function sGetCrabByNumber ({ card_number }) {
@@ -60,7 +60,7 @@ async function sGetCrabByNumber ({ card_number }) {
   if (error) {
     return err({ message: error.message });
   }
-  const mGetCrabByNumberRes = await mCheckCardByNumber({ card_number });
+  const mGetCrabByNumberRes = await mGetCardByNumber({ card_number });
   return mGetCrabByNumberRes;
 }
 async function sAddAddressByNumber ({ card_number, address_id, address_detail, address_user, address_mobile, address_date }) {
