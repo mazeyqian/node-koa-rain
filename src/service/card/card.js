@@ -63,7 +63,7 @@ async function sGetCrabByNumber ({ card_number }) {
   const mGetCrabByNumberRes = await mCheckCardByNumber({ card_number });
   return mGetCrabByNumberRes;
 }
-async function sAddAddressByNumber ({ card_number, address_detail, address_user, address_mobile, address_date }) {
+async function sAddAddressByNumber ({ card_number, address_id, address_detail, address_user, address_mobile, address_date }) {
   const schema = Joi.object({
     card_number: Joi.string()
       .required()
@@ -90,7 +90,8 @@ async function sAddAddressByNumber ({ card_number, address_detail, address_user,
   const mGetCrabByNumberRes = await mGetCardByNumber({ card_number });
   if (mGetCrabByNumberRes) {
     if (mGetCrabByNumberRes.address_id) {
-      return err({ message: '该卡已使用' });
+      const mUpdateAddressRes = await mUpdateAddress({ card_number, address_id, address_detail, address_user, address_mobile, address_date });
+      return mUpdateAddressRes;
     }
     const mAddAddressByNumberRes = await mAddAddressByNumber({ card_number, address_detail, address_user, address_mobile, address_date });
     if (mAddAddressByNumberRes) {

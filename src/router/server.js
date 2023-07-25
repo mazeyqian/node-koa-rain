@@ -288,7 +288,7 @@ server
     ctx.body = await sUpdateCardByAddressNumber({ address_id, address_number });
   })
   // 获取卡的详情
-  .post('/card/query-crab', async ctx => {
+  .post('/card/get-crab', async ctx => {
     const { card_number } = ctx.request.body;
     ctx.body = await sGetCrabByNumber({ card_number });
   });

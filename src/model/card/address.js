@@ -80,7 +80,7 @@ async function mAddAddressByNumber ({ card_number, address_detail, address_user,
   return err();
 }
 // 修改地址或者填写单号
-async function mUpdateAddress ({ address_id, address_detail, address_user, address_mobile, address_date, address_number }) {
+async function mUpdateAddress ({ card_number, address_id, address_detail, address_user, address_mobile, address_date, address_number }) {
   let ret = '';
   if (address_number) {
     ret = await MazeyAddress.update(
