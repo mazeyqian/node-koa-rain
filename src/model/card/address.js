@@ -43,6 +43,10 @@ const MazeyAddress = sqlIns.define(
     address_date: {
       type: DataTypes.STRING(50),
     },
+    // 存一下卡号
+    card_number: {
+      type: DataTypes.INTEGER,
+    },
   },
   {
     tableName: 'mazey_address',
@@ -50,8 +54,21 @@ const MazeyAddress = sqlIns.define(
     updatedAt: 'update_at',
   }
 );
+async function mGetAddressByNumber ({ card_number }) {
+  const ret = await MazeyAddress.findOne({
+    where: {
+      card_number,
+    },
+    through: { attributes: [] },
+  }).catch(console.error);
+  if (!ret) {
+    return err({ message: '该卡号没有地址' });
+  }
+  return rsp({ data: ret.dataValues });
+}
 async function mAddAddressByNumber ({ card_number, address_detail, address_user, address_mobile, address_date }) {
   const ret = await MazeyAddress.create({
+    card_number,
     address_detail,
     address_user,
     address_mobile,
@@ -104,6 +121,7 @@ async function mUpdateAddress ({ address_id, address_detail, address_user, addre
 MazeyAddress.sync();
 module.exports = {
   MazeyAddress,
+  mGetAddressByNumber,
   mAddAddressByNumber,
   mUpdateAddress,
 };

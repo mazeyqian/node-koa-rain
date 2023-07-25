@@ -3,7 +3,7 @@ const path = require('path');
 const { rsp, err } = require('../../entities/response');
 const ExcelJS = require('exceljs');
 const { mGetCardByNumber, mUpdateCard, mUpdateCardByAddress, mCheckCardByNumber } = require('../../model/card/card');
-const { mAddAddressByNumber, mUpdateAddress } = require('../../model/card/address');
+const { mAddAddressByNumber, mUpdateAddress, mGetAddressByNumber } = require('../../model/card/address');
 const { sRobotRemindCardAddress } = require('../robot/robot');
 const Joi = require('joi');
 async function sUploadCard (ctx) {
@@ -107,6 +107,11 @@ async function sUpdateCardByAddressNumber ({ address_id, address_number }) {
   const sUpdateCardByAddressRes = await mUpdateCardByAddress({ address_id });
   return sUpdateCardByAddressRes;
 }
+async function sGetAddressByNumber ({ card_number }) {
+  // 根据卡号获取
+  const mGetAddressByNumberRes = await mGetAddressByNumber({ card_number });
+  return mGetAddressByNumberRes;
+}
 
 module.exports = {
   sUploadCard,
@@ -114,4 +119,5 @@ module.exports = {
   sGetCrabByNumber,
   sAddAddressByNumber,
   sUpdateCardByAddressNumber,
+  sGetAddressByNumber,
 };
