@@ -1,8 +1,9 @@
 const fs = require('fs');
 const path = require('path');
-const { rsp, err } = require('../../entities/response');
+const { rsp } = require('../../entities/response');
+const { err } = require('../../entities/error');
 const ExcelJS = require('exceljs');
-const { mGetCardByNumber, mUpdateCard, mUpdateCardByAddress, mCheckCardByNumber } = require('../../model/card/card');
+const { mGetCardByNumber, mUpdateCard, mUpdateCardByAddress, mCheckCardByNumber, mBatchAddCard } = require('../../model/card/card');
 const { mAddAddressByNumber, mUpdateAddress, mGetAddressByNumber } = require('../../model/card/address');
 const { sRobotRemindCardAddress } = require('../robot/robot');
 const Joi = require('joi');
@@ -20,14 +21,22 @@ async function sUploadCard (ctx) {
   // 遍历行
   worksheet.eachRow((row, rowNumber) => {
     // 获取每一行的单元格数据
-    const rowData = [];
-    row.eachCell((cell, colNumber) => {
-      rowData.push(cell);
-    });
+    if (rowNumber !== 1) {
+      data.push({
+        card_number: row.getCell(1).value,
+        card_password: row.getCell(2).value,
+        crab_id: row.getCell(3).value,
+      });
+    }
+    // row.eachCell((cell, colNumber) => {
+    //   console.log('cell', colNumber, cell._value.model);
+    // });
     // 将每一行的数据存储到数组中
-    data.push(rowData);
   });
   console.log('data', data);
+  // 批量导入数据
+  const mBatchAddCardRes = await mBatchAddCard(data);
+  return mBatchAddCardRes;
 }
 async function sGetCardByNumber ({ card_number, card_password }) {
   const schema = Joi.object({
@@ -64,6 +73,7 @@ async function sGetCrabByNumber ({ card_number }) {
   return mGetCrabByNumberRes;
 }
 async function sAddAddressByNumber ({ card_number, address_id, address_detail, address_user, address_mobile, address_date }) {
+  console.log('address_detail', card_number, address_detail, address_user, address_mobile, address_date);
   const schema = Joi.object({
     card_number: Joi.string()
       .required()
@@ -83,14 +93,26 @@ async function sAddAddressByNumber ({ card_number, address_id, address_detail, a
   });
   const { error } = schema.validate({
     card_number,
+    address_detail,
+    address_user,
+    address_mobile,
+    address_date,
   });
   if (error) {
     return err({ message: error.message });
   }
+  if (address_id) {
+    const mUpdateAddressRes = await mUpdateAddress({ card_number, address_id: address_id, address_detail, address_user, address_mobile, address_date });
+    await sRobotRemindCardAddress({ card_number, address_detail, address_user, address_mobile, address_date });
+    return mUpdateAddressRes;
+  }
   const mGetCrabByNumberRes = await mGetCardByNumber({ card_number });
-  if (mGetCrabByNumberRes) {
-    if (mGetCrabByNumberRes.address_id) {
-      const mUpdateAddressRes = await mUpdateAddress({ card_number, address_id, address_detail, address_user, address_mobile, address_date });
+  console.log('mGetCrabByNumberRes', mGetCrabByNumberRes);
+  if (mGetCrabByNumberRes && mGetCrabByNumberRes.data) {
+    const { MazeyAddress } = mGetCrabByNumberRes.data;
+    if (MazeyAddress && MazeyAddress.address_id) {
+      const mUpdateAddressRes = await mUpdateAddress({ card_number, address_id: MazeyAddress.address_id, address_detail, address_user, address_mobile, address_date });
+      await sRobotRemindCardAddress({ card_number, address_detail, address_user, address_mobile, address_date });
       return mUpdateAddressRes;
     }
     const mAddAddressByNumberRes = await mAddAddressByNumber({ card_number, address_detail, address_user, address_mobile, address_date });
@@ -102,9 +124,9 @@ async function sAddAddressByNumber ({ card_number, address_id, address_detail, a
   }
   return err({ message: '失败' });
 }
-async function sUpdateCardByAddressNumber ({ address_id, address_number }) {
+async function sUpdateCardByAddressNumber ({ address_id, address_category, address_number }) {
   // 填入单号的同时修改卡为已使用
-  await mUpdateAddress({ address_id, address_number });
+  await mUpdateAddress({ address_id, address_category, address_number });
   const sUpdateCardByAddressRes = await mUpdateCardByAddress({ address_id });
   return sUpdateCardByAddressRes;
 }

@@ -263,7 +263,7 @@ server
     const { content } = ctx.request.body;
     ctx.body = await sSynthesize(ctx, { content });
   })
-  // 批量增加提货卡数据
+  // 批量增加提货卡数据(表格导入)
   .post('/card/batch-add', async ctx => {
     ctx.body = await sUploadCard(ctx);
   })
@@ -284,8 +284,8 @@ server
   })
   // 给某卡号地址增加快递单号
   .post('/card/update-address', async ctx => {
-    const { address_id, address_number } = ctx.request.body;
-    ctx.body = await sUpdateCardByAddressNumber({ address_id, address_number });
+    const { address_id, address_category, address_number } = ctx.request.body;
+    ctx.body = await sUpdateCardByAddressNumber({ address_id, address_category, address_number });
   })
   // 获取卡的详情
   .post('/card/get-crab', async ctx => {

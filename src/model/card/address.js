@@ -37,6 +37,7 @@ const MazeyAddress = sqlIns.define(
       // 快递单号
       type: DataTypes.STRING(50),
     },
+    // 京东 顺丰
     address_category: {
       type: DataTypes.STRING(50),
     },
@@ -80,12 +81,13 @@ async function mAddAddressByNumber ({ card_number, address_detail, address_user,
   return err();
 }
 // 修改地址或者填写单号
-async function mUpdateAddress ({ card_number, address_id, address_detail, address_user, address_mobile, address_date, address_number }) {
+async function mUpdateAddress ({ card_number, address_id, address_detail, address_user, address_mobile, address_date, address_category, address_number }) {
   let ret = '';
   if (address_number) {
     ret = await MazeyAddress.update(
       {
         address_number,
+        address_category,
       },
       {
         where: {
@@ -98,6 +100,7 @@ async function mUpdateAddress ({ card_number, address_id, address_detail, addres
     }
     return rsp({ data: ret.dataValues });
   } else {
+    console.log('我执行了嘛------------', card_number, address_id);
     const ret = await MazeyAddress.update(
       {
         address_detail,
@@ -111,8 +114,9 @@ async function mUpdateAddress ({ card_number, address_id, address_detail, addres
         },
       }
     ).catch(console.error);
-    if (ret && ret.dataValues) {
-      return rsp({ data: ret.dataValues });
+    console.log('ret', ret);
+    if (ret) {
+      return rsp({ data: {} });
     }
     return err();
   }
