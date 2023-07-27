@@ -33,7 +33,7 @@ const { sAddNewGame, sQueryAllGame, sQueryGame } = require('../service/game/game
 const { sAddNewScore, sQueryAllScore } = require('../service/game/score');
 const { sAddNewTags, sIsAddNewTags } = require('../service/game/tag');
 const { sGetChatInfo } = require('../service/chat');
-const { sUploadCard, sGetCardByNumber, sAddAddressByNumber, sUpdateCardByAddressNumber, sGetAddressByNumber, sGetCrabByNumber } = require('../service/card/card');
+const { sUploadCard, sBatchAddCrab, sGetCardByNumber, sAddAddressByNumber, sUpdateCardByAddressNumber, sGetAddressByNumber, sGetCrabByNumber } = require('../service/card/card');
 const weatherIns = new WeatherApi(WeatherConf.UID, WeatherConf.KEY);
 // 校验
 server
@@ -266,6 +266,10 @@ server
   // 批量增加提货卡数据(表格导入)
   .post('/card/batch-add', async ctx => {
     ctx.body = await sUploadCard(ctx);
+  })
+  // 批量增加货物信息(表格导入)
+  .post('/card/batch-add-crab', async ctx => {
+    ctx.body = await sBatchAddCrab(ctx);
   })
   // 通过卡号和密码判断有没有该提货卡
   .post('/card/get-number', async ctx => {

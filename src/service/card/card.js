@@ -5,6 +5,7 @@ const { err } = require('../../entities/error');
 const ExcelJS = require('exceljs');
 const { mGetCardByNumber, mUpdateCard, mUpdateCardByAddress, mCheckCardByNumber, mBatchAddCard } = require('../../model/card/card');
 const { mAddAddressByNumber, mUpdateAddress, mGetAddressByNumber } = require('../../model/card/address');
+const { mBatchAddCrab } = require('../../model/card/crab');
 const { sRobotRemindCardAddress } = require('../robot/robot');
 const Joi = require('joi');
 async function sUploadCard (ctx) {
@@ -37,6 +38,33 @@ async function sUploadCard (ctx) {
   // 批量导入数据
   const mBatchAddCardRes = await mBatchAddCard(data);
   return mBatchAddCardRes;
+}
+async function sBatchAddCrab (ctx) {
+  const file = ctx.request.files.file; // 获取上传文件
+  const filePath = file.path;
+  // 创建一个新的工作簿对象
+  const workbook = new ExcelJS.Workbook();
+  // 读取Excel文件
+  await workbook.xlsx.readFile(filePath);
+  // 获取第一个工作表
+  const worksheet = workbook.worksheets[0];
+  // 存储数据的数组
+  const data = [];
+  // 遍历行
+  worksheet.eachRow((row, rowNumber) => {
+    // 获取每一行的单元格数据
+    if (rowNumber !== 1) {
+      data.push({
+        crab_specification: row.getCell(1).value,
+        crab_weight: row.getCell(2).value,
+        crab_content: row.getCell(3).value,
+      });
+    }
+  });
+  console.log('data', data);
+  // 批量导入数据
+  const mBatchAddCrabRes = await mBatchAddCrab(data);
+  return mBatchAddCrabRes;
 }
 async function sGetCardByNumber ({ card_number, card_password }) {
   const schema = Joi.object({
@@ -138,6 +166,7 @@ async function sGetAddressByNumber ({ card_number }) {
 
 module.exports = {
   sUploadCard,
+  sBatchAddCrab,
   sGetCardByNumber,
   sGetCrabByNumber,
   sAddAddressByNumber,

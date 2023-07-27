@@ -320,7 +320,7 @@ async function sRobotRemindCardAddress ({ card_number, address_detail, address_u
   let content = `卡号: ${card_number}\n收货人: ${address_user}\n收货人手机号: ${address_mobile}\n详细地址: ${address_detail}\n发货日期: ${address_date}\n快递类型: ${address_category ||
     '京东'}\n快递单号: ${address_number || '暂无'}`;
   const res = await sCommonRobotSend({
-    alias: 'pigKey',
+    alias: 'sendOutKey',
     type: 'markdown',
     data: {
       content,

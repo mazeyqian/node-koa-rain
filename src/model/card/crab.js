@@ -1,7 +1,7 @@
 // 卡号 密码 状态(0, 1)
 const { sqlIns } = require('../../entities/orm');
 const { DataTypes } = require('sequelize');
-const { rsp, rspPage } = require('../../entities/response');
+const { rsp } = require('../../entities/response');
 const { err } = require('../../entities/error');
 const MazeyCrab = sqlIns.define(
   'MazeyCrab',
@@ -28,7 +28,15 @@ const MazeyCrab = sqlIns.define(
     updatedAt: 'update_at',
   }
 );
+async function mBatchAddCrab (data) {
+  const ret = await MazeyCrab.bulkCreate(data);
+  if (!ret) {
+    return err({ message: '失败' });
+  }
+  return rsp({ data: ret });
+}
 MazeyCrab.sync();
 module.exports = {
   MazeyCrab,
+  mBatchAddCrab,
 };
