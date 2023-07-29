@@ -4,7 +4,7 @@
 // const $mysql_database = 'mazey'; // Name
 const $mysql_server_name = 'localhost'; // Server
 const $mysql_username = 'root'; // User
-const $mysql_password = '123456'; // Password
+const $mysql_password = 'wxt123'; // Password
 const $mysql_database = 'mazey'; // Name
 const mysqlConf = {
   $mysql_server_name,
