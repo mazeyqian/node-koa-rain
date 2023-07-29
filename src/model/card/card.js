@@ -1,7 +1,7 @@
 // 卡号 密码 状态(0, 1)
 const { sqlIns } = require('../../entities/orm');
 const { DataTypes } = require('sequelize');
-const { rsp, rspPage } = require('../../entities/response');
+const { rsp } = require('../../entities/response');
 const { err } = require('../../entities/error');
 const { MazeyCrab } = require('./crab');
 const { MazeyAddress } = require('./address');
@@ -16,6 +16,7 @@ const MazeyCard = sqlIns.define(
     },
     card_number: {
       type: DataTypes.STRING(200),
+      unique: true,
     },
     card_password: {
       type: DataTypes.STRING(50),
@@ -34,7 +35,6 @@ const MazeyCard = sqlIns.define(
       type: DataTypes.INTEGER,
     },
     crab_id: {
-      // 自增 ID
       type: DataTypes.INTEGER,
     },
   },
@@ -42,6 +42,7 @@ const MazeyCard = sqlIns.define(
     tableName: 'mazey_card',
     createdAt: 'create_at',
     updatedAt: 'update_at',
+    indexes: [{ fields: ['card_number'] }],
   }
 );
 async function mCheckCardByNumber ({ card_number, card_password }) {
@@ -109,6 +110,13 @@ async function mUpdateCardByAddress ({ address_id }) {
   }
   return rsp({ data: ret.dataValues });
 }
+async function mBatchAddCard (data) {
+  const ret = await MazeyCard.bulkCreate(data);
+  if (!ret) {
+    return err({ message: '失败' });
+  }
+  return rsp({ data: ret });
+}
 // 两个外键
 MazeyCard.belongsTo(MazeyCrab, { foreignKey: 'crab_id' });
 MazeyCard.belongsTo(MazeyAddress, { foreignKey: 'address_id' });
@@ -118,4 +126,5 @@ module.exports = {
   mGetCardByNumber,
   mUpdateCard,
   mUpdateCardByAddress,
+  mBatchAddCard,
 };

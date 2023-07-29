@@ -37,11 +37,16 @@ const MazeyAddress = sqlIns.define(
       // 快递单号
       type: DataTypes.STRING(50),
     },
+    // 京东 顺丰
     address_category: {
       type: DataTypes.STRING(50),
     },
     address_date: {
       type: DataTypes.STRING(50),
+    },
+    // 存一下卡号
+    card_number: {
+      type: DataTypes.INTEGER,
     },
   },
   {
@@ -50,8 +55,21 @@ const MazeyAddress = sqlIns.define(
     updatedAt: 'update_at',
   }
 );
+async function mGetAddressByNumber ({ card_number }) {
+  const ret = await MazeyAddress.findOne({
+    where: {
+      card_number,
+    },
+    through: { attributes: [] },
+  }).catch(console.error);
+  if (!ret) {
+    return err({ message: '该卡号没有地址' });
+  }
+  return rsp({ data: ret.dataValues });
+}
 async function mAddAddressByNumber ({ card_number, address_detail, address_user, address_mobile, address_date }) {
   const ret = await MazeyAddress.create({
+    card_number,
     address_detail,
     address_user,
     address_mobile,
@@ -63,12 +81,13 @@ async function mAddAddressByNumber ({ card_number, address_detail, address_user,
   return err();
 }
 // 修改地址或者填写单号
-async function mUpdateAddress ({ address_id, address_detail, address_user, address_mobile, address_date, address_number }) {
+async function mUpdateAddress ({ card_number, address_id, address_detail, address_user, address_mobile, address_date, address_category, address_number }) {
   let ret = '';
   if (address_number) {
     ret = await MazeyAddress.update(
       {
         address_number,
+        address_category,
       },
       {
         where: {
@@ -81,6 +100,7 @@ async function mUpdateAddress ({ address_id, address_detail, address_user, addre
     }
     return rsp({ data: ret.dataValues });
   } else {
+    console.log('我执行了嘛------------', card_number, address_id);
     const ret = await MazeyAddress.update(
       {
         address_detail,
@@ -94,8 +114,9 @@ async function mUpdateAddress ({ address_id, address_detail, address_user, addre
         },
       }
     ).catch(console.error);
-    if (ret && ret.dataValues) {
-      return rsp({ data: ret.dataValues });
+    console.log('ret', ret);
+    if (ret) {
+      return rsp({ data: {} });
     }
     return err();
   }
@@ -104,6 +125,7 @@ async function mUpdateAddress ({ address_id, address_detail, address_user, addre
 MazeyAddress.sync();
 module.exports = {
   MazeyAddress,
+  mGetAddressByNumber,
   mAddAddressByNumber,
   mUpdateAddress,
 };
