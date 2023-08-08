@@ -38,6 +38,7 @@ app.use(
   })
 );
 app.context.linkMap = new Map();
+app.context.logContent = [];
 let j = schedule.scheduleJob('*/60 * * * *', () => {
   app.context.linkMap = new Map();
 });

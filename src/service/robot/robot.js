@@ -412,7 +412,7 @@ async function sRobotRemindForConfirmTag ({ ctx, user_id, user_name, game_id, ta
   let IsExistContentRes = null;
   let isExist = false;
   if (logContent) {
-    IsExistContentRes = await sIsExistContent({ content: logContent });
+    IsExistContentRes = await sIsExistContent({ ctx, content: logContent });
     ({
       data: { isExist },
     } = IsExistContentRes);
@@ -500,7 +500,7 @@ async function sRobotRemindForCommonTag ({ ctx, tags = [], contents = [], extra 
   let IsExistContentRes = null;
   let isExist = false;
   if (logContent) {
-    IsExistContentRes = await sIsExistContent({ content: logContent });
+    IsExistContentRes = await sIsExistContent({ ctx, content: logContent });
     ({
       data: { isExist },
     } = IsExistContentRes);
