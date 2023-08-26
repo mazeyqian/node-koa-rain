@@ -1,5 +1,5 @@
-const fs = require('fs');
-const path = require('path');
+// const fs = require('fs');
+// const path = require('path');
 const { rsp } = require('../../entities/response');
 const { err } = require('../../entities/error');
 const ExcelJS = require('exceljs');
@@ -8,6 +8,11 @@ const { mAddAddressByNumber, mUpdateAddress, mGetAddressByNumber } = require('..
 const { mBatchAddCrab } = require('../../model/card/crab');
 const { sRobotRemindCardAddress } = require('../robot/robot');
 const Joi = require('joi');
+const md5 = require('md5');
+const axios = require('axios');
+let querystring = require('querystring');
+const uuid = require('uuid');
+const { logistics } = require('../../config/env.development');
 async function sUploadCard (ctx) {
   const file = ctx.request.files.file; // 获取上传文件
   const filePath = file.path;
@@ -164,6 +169,39 @@ async function sGetAddressByNumber ({ card_number }) {
   return mGetAddressByNumberRes;
 }
 
+async function sGetAddressInfo ({ order_number }) {
+  let timestamp = Date.now();
+  const generatedUuid = uuid.v4();
+  let msgData = { trackingType: '1', trackingNumber: ['444003077898', '441003077850', order_number], methodType: '1' };
+  msgData = JSON.stringify(msgData);
+  // let codeString = msgData + timestamp + logistics.sandboxCode;
+  // let encodedStr = encodeURIComponent(codeString);
+  // const encodedBaseStr = Buffer.from(md5(encodedStr)).toString('base64');
+  let params = {
+    partnerID: logistics.partnerID,
+    requestID: generatedUuid,
+    serviceCode: 'EXP_RECE_SEARCH_ROUTES',
+    timestamp: timestamp,
+    msgData: msgData,
+    accessToken: 'DD5879D027CD44129C35C3E7D7668DEE',
+  };
+  console.log('params', params);
+  const encodedData = querystring.stringify(params);
+  try {
+    // 正式https://bspgw.sf-express.com/std/service
+    // 沙箱https://sfapi-sbox.sf-express.com/std/service
+    let addressResult = await axios.post('https://sfapi-sbox.sf-express.com/std/service', encodedData, {
+      headers: {
+        'Content-type': 'application/x-www-form-urlencoded;charset=UTF-8',
+      },
+    });
+    console.log('addressResult', addressResult);
+    return rsp();
+  } catch (error) {
+    console.error('sf error:', error);
+  }
+}
+
 module.exports = {
   sUploadCard,
   sBatchAddCrab,
@@ -172,4 +210,5 @@ module.exports = {
   sAddAddressByNumber,
   sUpdateCardByAddressNumber,
   sGetAddressByNumber,
+  sGetAddressInfo,
 };

@@ -33,7 +33,7 @@ const { sAddNewGame, sQueryAllGame, sQueryGame } = require('../service/game/game
 const { sAddNewScore, sQueryAllScore } = require('../service/game/score');
 const { sAddNewTags, sIsAddNewTags } = require('../service/game/tag');
 const { sGetChatInfo } = require('../service/chat');
-const { sUploadCard, sBatchAddCrab, sGetCardByNumber, sAddAddressByNumber, sUpdateCardByAddressNumber, sGetAddressByNumber, sGetCrabByNumber } = require('../service/card/card');
+const { sUploadCard, sBatchAddCrab, sGetCardByNumber, sAddAddressByNumber, sUpdateCardByAddressNumber, sGetAddressByNumber, sGetCrabByNumber, sGetAddressInfo } = require('../service/card/card');
 const weatherIns = new WeatherApi(WeatherConf.UID, WeatherConf.KEY);
 // 校验
 server
@@ -295,6 +295,10 @@ server
   .post('/card/get-crab', async ctx => {
     const { card_number } = ctx.request.body;
     ctx.body = await sGetCrabByNumber({ card_number });
+  })
+  // 获取物流信息
+  .get('/card/get-logistics', async ctx => {
+    const { order_number } = ctx.request.body;
+    ctx.body = await sGetAddressInfo({ order_number });
   });
-
 module.exports = server;
