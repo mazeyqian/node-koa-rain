@@ -12,12 +12,17 @@ const MazeyCrab = sqlIns.define(
       primaryKey: true,
       autoIncrement: true,
     },
+    crab_amount: {
+      type: DataTypes.INTEGER,
+    },
+    // 规格
     crab_specification: {
       type: DataTypes.STRING(100),
     },
     crab_weight: {
       type: DataTypes.INTEGER,
     },
+    // 具体的描述
     crab_content: {
       type: DataTypes.STRING(500),
     },
