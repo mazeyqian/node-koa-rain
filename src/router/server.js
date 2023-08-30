@@ -297,7 +297,7 @@ server
     ctx.body = await sGetCrabByNumber({ card_number });
   })
   // 获取物流信息
-  .get('/card/get-logistics', async ctx => {
+  .post('/card/get-logistics', async ctx => {
     const { order_number } = ctx.request.body;
     ctx.body = await sGetAddressInfo({ order_number });
   });

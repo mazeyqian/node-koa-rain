@@ -170,9 +170,16 @@ async function sGetAddressByNumber ({ card_number }) {
 }
 
 async function sGetAddressInfo ({ order_number }) {
+  // 需要根据卡号查一下快递单号吗?
+  let tokenParams = {
+    partnerID: logistics.partnerID,
+    secret: logistics.sandboxCode,
+    grantType: 'password',
+  };
+  const encodeToken = querystring.stringify(tokenParams);
   let timestamp = Date.now();
   const generatedUuid = uuid.v4();
-  let msgData = { trackingType: '1', trackingNumber: ['444003077898', '441003077850', order_number], methodType: '1' };
+  let msgData = { trackingType: '1', trackingNumber: [order_number], methodType: '1' };
   msgData = JSON.stringify(msgData);
   // let codeString = msgData + timestamp + logistics.sandboxCode;
   // let encodedStr = encodeURIComponent(codeString);
@@ -183,20 +190,29 @@ async function sGetAddressInfo ({ order_number }) {
     serviceCode: 'EXP_RECE_SEARCH_ROUTES',
     timestamp: timestamp,
     msgData: msgData,
-    accessToken: 'DD5879D027CD44129C35C3E7D7668DEE',
+    accessToken: '',
   };
-  console.log('params', params);
-  const encodedData = querystring.stringify(params);
   try {
     // 正式https://bspgw.sf-express.com/std/service
     // 沙箱https://sfapi-sbox.sf-express.com/std/service
+    let accessTokenRes = await axios.post('https://sfapi-sbox.sf-express.com/oauth2/accessToken', encodeToken, {
+      headers: {
+        'Content-type': 'application/x-www-form-urlencoded;charset=UTF-8',
+      },
+    });
+    console.log('accessTokenRes', accessTokenRes);
+    const { data } = accessTokenRes;
+    params.accessToken = data.accessToken;
+    console.log('params', params);
+    const encodedData = querystring.stringify(params);
     let addressResult = await axios.post('https://sfapi-sbox.sf-express.com/std/service', encodedData, {
       headers: {
         'Content-type': 'application/x-www-form-urlencoded;charset=UTF-8',
       },
     });
+    let addressData = addressResult.data;
     console.log('addressResult', addressResult);
-    return rsp();
+    return rsp({ data: addressData.apiResultData });
   } catch (error) {
     console.error('sf error:', error);
   }
